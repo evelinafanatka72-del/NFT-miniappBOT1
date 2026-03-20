@@ -3,129 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NFT Store</title>
+    <title>NFT Pro App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --tg-theme-bg-color: #1a1a1a;
-            --tg-theme-text-color: #ffffff;
-            --tg-theme-button-color: #248bcf;
-            --tg-theme-secondary-bg-color: #2c2c2e;
+            --bg: #0f1218;
+            --card-bg: #1c212b;
+            --accent: #4facfe;
+            --text: #ffffff;
+            --gray: #8e8e93;
         }
 
         body {
-            background-color: var(--tg-theme-bg-color);
-            color: var(--tg-theme-text-color);
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0; padding: 0; padding-bottom: 80px;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 25px;
+        /* Навигация */
+        .tabs {
+            display: none; padding: 20px;
+        }
+        .tabs.active {
+            display: block;
         }
 
-        .header h1 {
-            font-size: 24px;
-            margin: 0;
-            background: linear-gradient(45deg, #00f2fe, #4facfe);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .nav-bar {
+            position: fixed; bottom: 0; width: 100%;
+            background: var(--card-bg);
+            display: flex; justify-content: space-around;
+            padding: 10px 0; border-top: 1px solid #333;
         }
 
-        .nft-container {
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .card {
-            background-color: var(--tg-theme-secondary-bg-color);
-            border-radius: 20px;
-            padding: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .image-placeholder {
-            width: 100%;
-            height: 180px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 40px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin: 5px 0;
-        }
-
-        .card-price {
-            color: #4facfe;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        .buy-btn {
-            background-color: var(--tg-theme-button-color);
-            color: white;
-            border: none;
-            width: 100%;
-            padding: 12px;
-            border-radius: 12px;
-            font-weight: bold;
-            font-size: 16px;
+        .nav-item {
+            font-size: 12px; text-align: center; color: var(--gray);
             cursor: pointer;
-            transition: transform 0.1s;
+        }
+        .nav-item.active { color: var(--accent); }
+
+        /* Карточки и кнопки */
+        .card {
+            background: var(--card-bg); border-radius: 15px;
+            padding: 15px; margin-bottom: 15px;
         }
 
-        .buy-btn:active {
-            transform: scale(0.97);
+        .btn {
+            background: var(--accent); color: white; border: none;
+            padding: 12px; border-radius: 10px; width: 100%;
+            font-weight: bold; margin-top: 10px;
         }
+
+        input[type="file"] { display: none; }
+        .upload-label {
+            display: block; background: #333; padding: 20px;
+            border-radius: 10px; border: 2px dashed var(--accent);
+            text-align: center; margin: 10px 0;
+        }
+
+        #preview-container img, #preview-container video {
+            width: 100%; border-radius: 10px; margin-top: 10px;
+        }
+
+        .review { font-size: 14px; border-left: 3px solid var(--accent); padding-left: 10px; margin-bottom: 10px;}
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>NFT Mini App</h1>
-        <p>Эксклюзивные цифровые активы</p>
+<div id="market" class="tabs active">
+    <h2 style="background: linear-gradient(45deg, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">NFT Market</h2>
+    <div class="card">
+        <div style="height:150px; background: #333; border-radius:10px; display:flex; align-items:center; justify-content:center">💎</div>
+        <h3>Diamond Punk</h3>
+        <p class="review">"Лучшая покупка за этот год!" — @player1</p>
+        <p class="review">"Анимация просто пушка 🔥" — @nft_king</p>
+        <button class="btn" onclick="buy()">Купить</button>
     </div>
+</div>
 
-    <div class="nft-container">
-        <div class="card">
-            <div class="image-placeholder">💎</div>
-            <div class="card-title">Cyber Diamond #01</div>
-            <div class="card-price">1.5 TON</div>
-            <button class="buy-btn" onclick="buyItem('Cyber Diamond #01')">Купить</button>
-        </div>
-
-        <div class="card">
-            <div class="image-placeholder">🔥</div>
-            <div class="card-title">Ether Flame #42</div>
-            <div class="card-price">2.8 TON</div>
-            <button class="buy-btn" onclick="buyItem('Ether Flame #42')">Купить</button>
-        </div>
+<div id="create" class="tabs">
+    <h2>Создать NFT</h2>
+    <div class="card">
+        <p>Поддержка: JPG, PNG, MP4 (до 5 сек)</p>
+        <label class="upload-label" for="file-input">Нажмите, чтобы выбрать файл</label>
+        <input type="file" id="file-input" accept="image/*,video/mp4" onchange="previewFile()">
+        <input type="text" id="nft-name" placeholder="Название NFT" style="width:90%; padding:10px; border-radius:5px; border:none; margin-top:10px">
+        <div id="preview-container"></div>
+        <button class="btn" onclick="mint()">Создать бесплатно</button>
     </div>
+</div>
 
-    <script>
-        // Инициализация WebApp
-        const tg = window.Telegram.WebApp;
-        tg.expand(); // Развернуть на весь экран
+<div id="settings" class="tabs">
+    <h2>Настройки</h2>
+    <div class="card" onclick="tg.showAlert('Язык: Русский')">🌐 Язык: Русский</div>
+    <div class="card" onclick="location.reload()">🔄 Перезагрузить приложение</div>
+    <div class="card" onclick="tg.openTelegramLink('https://t.me/your_support_link')">🎧 Служба поддержки</div>
+    <div class="card">
+        <p>Уведомления</p>
+        <button class="btn" style="background:#333" onclick="tg.showAlert('Настройки сохранены!')">Вкл/Выкл</button>
+    </div>
+</div>
 
-        function buyItem(name) {
-            tg.showConfirm(`Вы действительно хотите купить ${name}?`);
+<div class="nav-bar">
+    <div class="nav-item active" onclick="showTab('market', this)">🛒 Маркет</div>
+    <div class="nav-item" onclick="showTab('create', this)">➕ Создать</div>
+    <div class="nav-item" onclick="showTab('settings', this)">⚙️ Настройки</div>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function showTab(tabId, el) {
+        document.querySelectorAll('.tabs').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+    }
+
+    function previewFile() {
+        const preview = document.getElementById('preview-container');
+        const file = document.querySelector('input[type=file]').files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.innerHTML = '';
+            if (file.type.includes('video')) {
+                const video = document.createElement('video');
+                video.src = reader.result;
+                video.autoplay = true; video.loop = true; video.muted = true;
+                preview.appendChild(video);
+            } else {
+                const img = document.createElement('img');
+                img.src = reader.result;
+                preview.appendChild(img);
+            }
         }
-    </script>
+        if (file) reader.readAsDataURL(file);
+    }
+
+    function mint() {
+        const name = document.getElementById('nft-name').value;
+        if (!name) return tg.showAlert("Введите название!");
+        tg.showConfirm(`Создать NFT "${name}"?`);
+    }
+
+    function buy() {
+        tg.showConfirm("Подтвердить покупку?");
+    }
+</script>
+
 </body>
 </html>

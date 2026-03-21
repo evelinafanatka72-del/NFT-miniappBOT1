@@ -6,39 +6,42 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root { --bg: #0f1218; --card: #1c212b; --text: #ffffff; --accent: #4facfe; --gold: #ffd700; --red: #ff4b4b; }
-        body.light { --bg: #f0f2f5; --card: #ffffff; --text: #000000; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; }
         
+        /* Хедер с балансом */
         .header-stats { display: flex; justify-content: space-around; background: var(--card); padding: 15px; border-bottom: 1px solid #333; position: sticky; top:0; z-index:100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
         .stat-item { text-align: center; }
         .stat-item span { color: var(--accent); font-weight: bold; display: block; font-size: 14px; }
 
-        .tabs { display: none; padding: 15px; animation: fadeIn 0.3s; }
+        /* Вкладки */
+        .tabs { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .tabs.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .nft-card { background: var(--card); border-radius: 22px; padding: 15px; margin-bottom: 20px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
-        .img-box { width: 100%; height: 250px; border-radius: 18px; overflow: hidden; background: #252a34; position: relative; border: 1px solid #333; }
+        /* Карточки NFT */
+        .nft-card { background: var(--card); border-radius: 22px; padding: 15px; margin-bottom: 20px; position: relative; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .img-box { width: 100%; height: 250px; border-radius: 18px; overflow: hidden; background: #252a34; position: relative; border: 1px solid #333; display: flex; align-items: center; justify-content: center; }
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
         
-        .watermark { position: absolute; bottom: 10px; right: 10px; opacity: 0.6; font-size: 11px; font-weight: bold; color: white; background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 6px; pointer-events: none; }
         .badge { position: absolute; top: 12px; left: 12px; padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: bold; z-index: 5; text-transform: uppercase; }
         .elite { background: var(--gold); color: #000; box-shadow: 0 0 15px var(--gold); }
-        .limited { background: var(--red); color: #fff; }
 
-        .btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 14px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; }
-        .btn:active { transform: scale(0.97); opacity: 0.8; }
-        .btn-sm { width: auto; padding: 8px 15px; font-size: 12px; background: #333; display: inline-flex; align-items: center; gap: 5px; }
+        /* Кнопки и формы */
+        .btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 14px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; margin-top: 10px; }
+        .btn:active { transform: scale(0.98); }
+        .btn-sec { background: #333; }
+        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
 
-        .nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; padding: 12px 0; border-top: 1px solid #333; z-index: 1000; }
-        .nav-item { flex: 1; text-align: center; font-size: 22px; opacity: 0.3; transition: 0.3s; cursor: pointer; }
-        .nav-item.active { opacity: 1; color: var(--accent); transform: translateY(-3px); }
-
-        .input-group { margin-top: 15px; }
-        input, select { width: 100%; padding: 14px; margin-top: 8px; background: #111; border: 1px solid #333; border-radius: 12px; color: white; box-sizing: border-box; outline: none; }
+        input, textarea, select { width: 100%; padding: 14px; margin-top: 10px; background: #111; border: 1px solid #333; border-radius: 12px; color: white; box-sizing: border-box; outline: none; font-size: 14px; }
         
-        .section-title { font-size: 22px; font-weight: 800; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-        .item-row { background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+        /* Профиль */
+        .profile-box { text-align: center; padding: 25px; background: linear-gradient(180deg, var(--card) 0%, var(--bg) 100%); border-radius: 25px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .avatar { width: 90px; height: 90px; background: var(--accent); border-radius: 50%; margin: 0 auto 15px; font-size: 40px; line-height: 90px; border: 4px solid var(--card); box-shadow: 0 0 20px var(--accent); cursor: pointer; }
+
+        /* Навигация */
+        .nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; padding: 12px 0; border-top: 1px solid #333; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; font-size: 24px; opacity: 0.3; transition: 0.3s; cursor: pointer; }
+        .nav-item.active { opacity: 1; color: var(--accent); transform: translateY(-3px); }
     </style>
 </head>
 <body>
@@ -46,68 +49,58 @@
 <div class="header-stats">
     <div class="stat-item">TON<span id="bal-ton">0.00</span></div>
     <div class="stat-item">NFcoin<span id="bal-nf">0</span></div>
-    <div class="stat-item">LTFER<span id="bal-ltfer">0</span></div>
 </div>
 
 <div id="market" class="tabs active">
-    <div class="section-title">🛒 Глобальный Маркет</div>
+    <h2 style="margin-top:0">🛒 Глобальный Маркет</h2>
     <div id="market-list"></div>
 </div>
 
 <div id="quests" class="tabs">
-    <div class="section-title">💰 Задания</div>
+    <h2>💰 Задания</h2>
     <div class="nft-card">
-        <b>Подписка на канал разработчика</b><br><small>Награда: 280 NFcoin</small>
-        <button class="btn" style="margin-top:10px" onclick="claimReward('nf', 280, this)">Выполнить</button>
+        <b>Подписка на NFTzet News</b><br><small>+500 NFcoin</small>
+        <button class="btn" onclick="reward('nf', 500, this)">Выполнить</button>
     </div>
     <div class="nft-card">
-        <b>Пригласить 3 друзей</b><br><small>Награда: 1.50 TON</small>
-        <button class="btn" style="margin-top:10px" onclick="claimReward('ton', 1.5, this)">Выполнить</button>
-    </div>
-    <div class="nft-card">
-        <b>Ежедневный бонус за вход</b><br><small>Награда: 5000 LTFER</small>
-        <button class="btn" style="margin-top:10px" onclick="claimReward('ltfer', 5000, this)">Забрать</button>
+        <b>Пригласить партнера</b><br><small>+2.5 TON</small>
+        <button class="btn" onclick="reward('ton', 2.5, this)">Выполнить</button>
     </div>
 </div>
 
 <div id="create" class="tabs">
-    <div class="section-title">➕ Создать NFT</div>
+    <h2>➕ Создать шедевр</h2>
     <div class="nft-card">
-        <div class="img-box" id="pre-box" onclick="document.getElementById('f').click()" style="display:flex; align-items:center; justify-content:center; flex-direction:column; cursor:pointer;">
-            <span style="font-size: 40px;">🖼</span>
-            <span>Выбрать медиа</span>
+        <div class="img-box" id="pre-box" onclick="document.getElementById('f').click()">
+            <span>📸 Выбрать фото</span>
         </div>
         <input type="file" id="f" style="display:none" onchange="handleFile(this)">
-        <div class="input-group">
-            <input type="text" id="nn" placeholder="Название NFT">
-            <div style="display:flex; gap:10px">
-                <input type="number" id="np" placeholder="Цена" style="flex:2">
-                <select id="nc" style="flex:1"><option>TON</option><option>NFcoin</option></select>
-            </div>
+        <input type="text" id="nn" placeholder="Название NFT">
+        <textarea id="nd" placeholder="Описание вашего NFT..." rows="3"></textarea>
+        <div style="display:flex; gap:10px">
+            <input type="number" id="np" placeholder="Цена" style="flex:2">
+            <select id="nc" style="flex:1"><option>TON</option><option>NFcoin</option></select>
         </div>
-        <label style="display:block; margin-top:15px; font-size: 14px;"><input type="checkbox" id="is-e"> 💎 Статус ELITE (1000 NFcoin)</label>
-        <label style="display:block; margin-top:8px; font-size: 14px;"><input type="checkbox" id="is-l"> 🔥 LIMITED Edition</label>
-        <button class="btn" style="margin-top:20px" onclick="publishNFT()">Опубликовать в Мир</button>
+        <label style="display:block; margin-top:15px; font-size:12px"><input type="checkbox" id="is-e"> 💎 Статус ELITE (1000 NFcoin)</label>
+        <button class="btn" onclick="publishNFT(false)">Опубликовать</button>
+        <button class="btn btn-outline" onclick="publishNFT(true)">Сделать бесплатным</button>
     </div>
 </div>
 
 <div id="profile" class="tabs">
-    <div style="text-align:center; padding: 20px;">
-        <div id="p-ava" style="width:100px; height:100px; background:linear-gradient(45deg, #4facfe, #00f2fe); border-radius:50%; margin: 0 auto; line-height:100px; font-size:45px; box-shadow: 0 0 25px rgba(79, 172, 254, 0.4);">👤</div>
-        <h2 id="p-name" style="margin: 15px 0 5px 0;">Загрузка...</h2>
-        <p id="p-status" style="color: var(--accent); font-weight: bold; margin: 0;">NFT Collector</p>
+    <div class="profile-box">
+        <div class="avatar" id="p-ava" onclick="editAva()">👤</div>
+        <h2 id="p-name" style="margin:0">Загрузка...</h2>
+        <p id="p-desc" onclick="editDesc()" style="color:#888; font-size:14px; margin-top:10px">Нажми, чтобы добавить описание...</p>
     </div>
-    <div class="section-title">📦 Моя коллекция</div>
-    <div id="my-nfts-list"></div>
+    <h3>🛍 Мои покупки</h3>
+    <div id="my-nfts"></div>
 </div>
 
 <div id="settings" class="tabs">
-    <div class="section-title">⚙️ Настройки</div>
-    <div class="item-row" onclick="toggleOption('inc')">👤 Инкогнито <b id="set-inc">ВЫКЛ</b></div>
-    <div class="item-row" onclick="toggleOption('priv')">🔒 Приватный аккаунт <b id="set-priv">ВЫКЛ</b></div>
-    <div class="item-row" onclick="toggleOption('lang')">🌐 Язык <b id="set-lang">Русский</b></div>
-    <div class="item-row" onclick="tg.showAlert('Служба поддержки скоро свяжется с вами!')">🛠 Поддержка</div>
-    <button class="btn" style="background:#444; margin-top:20px" onclick="location.reload()">🔄 Перезагрузить систему</button>
+    <h2>⚙️ Настройки</h2>
+    <div class="nft-card" onclick="toggleIncognito()">👤 Режим инкогнито <b id="s-inc" style="float:right; color:var(--accent)">ВЫКЛ</b></div>
+    <button class="btn btn-sec" onclick="location.reload()">🔄 Перезагрузить</button>
 </div>
 
 <nav class="nav">
@@ -121,48 +114,44 @@
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
-    tg.enableClosingConfirmation();
 
-    // Синхронизация профиля
-    const userData = tg.initDataUnsafe?.user || { first_name: "Пользователь", id: 0 };
-    document.getElementById('p-name').innerText = userData.first_name;
-
-    // Глобальная база (симуляция)
-    let store = JSON.parse(localStorage.getItem('nft_ultra_v2')) || { 
-        bal: {ton:0, nf:500, ltfer:0}, 
+    // ЕДИНАЯ БАЗА (Больше не пропадет)
+    let store = JSON.parse(localStorage.getItem('NFT_ULTIMATE_DATA')) || {
+        bal: {ton: 0, nf: 100},
         items: [],
-        inc: false,
-        priv: false,
-        lang: 'RU'
+        bought: [],
+        incognito: false,
+        user: { 
+            name: tg.initDataUnsafe?.user?.first_name || "Пользователь", 
+            ava: "👤", 
+            desc: "NFT Коллекционер", 
+            nickNFT: "" 
+        }
     };
 
-    function save() { localStorage.setItem('nft_ultra_v2', JSON.stringify(store)); updateUI(); }
+    function save() { localStorage.setItem('NFT_ULTIMATE_DATA', JSON.stringify(store)); update(); }
 
-    // АВТО-ЗАРАБОТОК: 1 TON и 10 NFcoin в минуту
+    // Авто-заработок
     setInterval(() => {
-        store.bal.ton += 1.00;
+        store.bal.ton += 1;
         store.bal.nf += 10;
         save();
         if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
     }, 60000);
 
-    function updateUI() {
+    function update() {
         document.getElementById('bal-ton').innerText = store.bal.ton.toFixed(2);
         document.getElementById('bal-nf').innerText = store.bal.nf;
-        document.getElementById('bal-ltfer').innerText = store.bal.ltfer;
         
-        document.getElementById('set-inc').innerText = store.inc ? "ВКЛ" : "ВЫКЛ";
-        document.getElementById('set-priv').innerText = store.priv ? "ВКЛ" : "ВЫКЛ";
-        document.getElementById('set-lang').innerText = store.lang === 'RU' ? "Русский" : "English";
+        // Ник с NFT
+        const displayNick = store.user.nickNFT ? `${store.user.name} | ${store.user.nickNFT}` : store.user.name;
+        document.getElementById('p-name').innerText = store.incognito ? "Anonymous" : displayNick;
+        document.getElementById('p-ava').innerText = store.incognito ? "🕶" : store.user.ava;
+        document.getElementById('p-desc').innerText = store.user.desc;
+        document.getElementById('s-inc').innerText = store.incognito ? "ВКЛ" : "ВЫКЛ";
 
-        if(store.inc) {
-            document.getElementById('p-name').innerText = "Пользователь Z";
-            document.getElementById('p-ava').innerText = "🕶";
-        } else {
-            document.getElementById('p-name').innerText = userData.first_name;
-            document.getElementById('p-ava').innerText = "👤";
-        }
         renderMarket();
+        renderBought();
     }
 
     function tab(id, el) {
@@ -172,84 +161,110 @@
         el.classList.add('active');
     }
 
-    function claimReward(cur, val, btn) {
-        store.bal[cur] += val;
-        btn.disabled = true;
-        btn.innerText = "Получено!";
-        btn.style.background = "#222";
-        save();
-        tg.showAlert(`Награда ${val} ${cur.toUpperCase()} зачислена!`);
-    }
-
     function handleFile(input) {
-        if (!input.files[0]) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            document.getElementById('pre-box').innerHTML = `<img src="${e.target.result}"><div class="watermark">NFTzet Global</div>`;
+            document.getElementById('pre-box').innerHTML = `<img src="${e.target.result}"><div style="position:absolute;bottom:10px;right:10px;font-size:10px;background:rgba(0,0,0,0.5);padding:2px 5px;border-radius:4px">NFTzet</div>`;
         };
         reader.readAsDataURL(input.files[0]);
     }
 
-    function publishNFT() {
+    function publishNFT(free) {
         const name = document.getElementById('nn').value;
+        const desc = document.getElementById('nd').value;
         const elite = document.getElementById('is-e').checked;
-        const limited = document.getElementById('is-l').checked;
-        
-        if(!name) return tg.showAlert("Ошибка: Введите название!");
-        if(elite && store.bal.nf < 1000) return tg.showAlert("Нужно 1000 NFcoin для статуса ELITE!");
-        
+        if(!name) return tg.showAlert("Введите название!");
+
+        if(elite && store.bal.nf < 1000) return tg.showAlert("Нужно 1000 NFcoin!");
         if(elite) store.bal.nf -= 1000;
 
-        const newItem = {
-            name, elite, limited,
-            price: document.getElementById('np').value || 0,
+        const item = {
+            id: Date.now(),
+            name, desc,
+            price: free ? 0 : (document.getElementById('np').value || 0),
             cur: document.getElementById('nc').value,
             img: document.getElementById('pre-box').innerHTML,
-            author: store.inc ? "Anonymous" : userData.first_name,
-            id: Date.now()
+            elite: elite,
+            author: store.incognito ? "Anonymous" : store.user.name
         };
 
-        store.items.unshift(newItem);
+        store.items.unshift(item);
         save();
-        tg.showAlert("NFT успешно опубликован в глобальную сеть!");
+        tg.showAlert("Успешно опубликовано!");
         tab('market', document.querySelectorAll('.nav-item')[0]);
+    }
+
+    function buy(id) {
+        const item = store.items.find(i => i.id === id);
+        tg.showConfirm(`Купить ${item.name}?`, (ok) => {
+            if(ok) {
+                store.bought.push(item);
+                save();
+                tg.showAlert("Куплено! Теперь этот NFT в твоем профиле.");
+            }
+        });
+    }
+
+    function setInNick(nftName) {
+        store.user.nickNFT = nftName;
+        save();
+        tg.showAlert("Ник обновлен!");
+    }
+
+    function reward(cur, val, btn) {
+        store.bal[cur] += val;
+        btn.disabled = true;
+        btn.innerText = "Готово";
+        save();
     }
 
     function renderMarket() {
         const list = document.getElementById('market-list');
         list.innerHTML = '';
-        store.items.forEach(item => {
+        store.items.forEach(i => {
             list.innerHTML += `
                 <div class="nft-card">
-                    ${item.elite ? '<div class="badge elite">💎 Elite</div>' : ''}
-                    ${item.limited ? '<div class="badge limited" style="left:auto; right:12px">🔥 Limited</div>' : ''}
-                    <div class="img-box">${item.img || '<div style="padding-top:100px; text-align:center">📦 NFT Asset</div>'}</div>
-                    <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:12px">
-                        <div>
-                            <h3 style="margin:0">${item.name}</h3>
-                            <small style="color:#888">Создатель: ${item.author}</small>
-                        </div>
-                        <div style="text-align:right">
-                            <span style="display:block; font-size:10px; color:#888">Цена</span>
-                            <b style="color:var(--accent); font-size:18px">${item.price} ${item.cur}</b>
-                        </div>
-                    </div>
-                    <div style="display:flex; gap:10px; margin-top:15px">
-                        <button class="btn" style="flex:3" onclick="tg.showConfirm('Подтвердить покупку?')">Купить сейчас</button>
-                        <button class="btn" style="flex:1; background:#333" onclick="tg.showPopup({title:'Опции', message:'Автор: ${item.author}', buttons:[{text:'Отзыв', id:'rev'},{text:'Жалоба', type:'destructive'}]})">⋮</button>
+                    ${i.elite ? '<div class="badge elite">💎 Elite</div>' : ''}
+                    <div class="img-box">${i.img}</div>
+                    <h3 style="margin:10px 0 5px">${i.name}</h3>
+                    <p style="font-size:12px; color:#888; margin:0">${i.desc || 'Без описания'}</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px">
+                        <b>${i.price} ${i.cur}</b>
+                        <button class="btn" style="width:auto; padding:8px 20px; margin:0" onclick="buy(${i.id})">Купить</button>
                     </div>
                 </div>`;
         });
     }
 
-    function toggleOption(type) {
-        if(type === 'inc') store.inc = !store.inc;
-        if(type === 'priv') store.priv = !store.priv;
-        if(type === 'lang') store.lang = (store.lang === 'RU' ? 'EN' : 'RU');
+    function renderBought() {
+        const list = document.getElementById('my-nfts');
+        list.innerHTML = '';
+        store.bought.forEach(i => {
+            list.innerHTML += `
+                <div class="nft-card">
+                    <div class="img-box">${i.img}</div>
+                    <h3>${i.name}</h3>
+                    <button class="btn btn-sec" onclick="setInNick('${i.name}')">Поставить в ник</button>
+                </div>`;
+        });
+    }
+
+    function editAva() {
+        const a = prompt("Введи эмодзи для авы:", store.user.ava);
+        if(a) { store.user.ava = a; save(); }
+    }
+
+    function editDesc() {
+        const d = prompt("О себе:", store.user.desc);
+        if(d) { store.user.desc = d; save(); }
+    }
+
+    function toggleIncognito() {
+        store.incognito = !store.incognito;
         save();
     }
 
-    updateUI();
+    update();
 </script>
 </body>
 </html>

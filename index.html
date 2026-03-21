@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --bg: #0f1218; --card: #1c212b; --text: #ffffff; --accent: #4facfe; --gold: #ffd700; }
+        :root { --bg: #0f1218; --card: #1c212b; --text: #ffffff; --accent: #4facfe; --green: #4caf50; }
         body.light { --bg: #f0f2f5; --card: #ffffff; --text: #000000; }
         body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; overflow-x: hidden; transition: 0.3s; }
         
@@ -17,23 +17,24 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .nft-card { background: var(--card); border-radius: 22px; padding: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
-        .img-box { width: 100%; height: 230px; border-radius: 18px; overflow: hidden; background: #252a34; display: flex; align-items: center; justify-content: center; border: 1px solid #333; }
+        .img-box { width: 100%; height: 230px; border-radius: 18px; overflow: hidden; background: #252a34; display: flex; align-items: center; justify-content: center; border: 1px solid #333; position: relative; }
         .img-box img { width: 100%; height: 100%; object-fit: cover; }
         
-        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.2s; font-size: 14px; margin-top: 10px; }
+        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; cursor: pointer; font-size: 14px; margin-top: 10px; }
         .btn-sec { background: #333; }
+        .btn-gen { background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%); }
 
-        input, textarea, select { width: 100%; padding: 14px; margin-top: 10px; background: #111; border: 1px solid #333; border-radius: 12px; color: white; box-sizing: border-box; outline: none; }
+        input, textarea, select { width: 100%; padding: 14px; margin-top: 10px; background: #111; border: 1px solid #333; border-radius: 12px; color: white; box-sizing: border-box; }
         
-        .setting-row { background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; }
+        .setting-row { background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); }
         .setting-val { color: var(--accent); font-weight: bold; font-size: 13px; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--card); padding: 25px; border-radius: 25px; width: 85%; border: 1px solid var(--accent); }
-
+        
         .nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; padding: 12px 0; border-top: 1px solid #333; z-index: 1000; }
         .nav-item { flex: 1; text-align: center; font-size: 24px; opacity: 0.3; transition: 0.3s; cursor: pointer; }
         .nav-item.active { opacity: 1; color: var(--accent); transform: translateY(-3px); }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card); padding: 25px; border-radius: 25px; width: 85%; border: 1px solid var(--accent); max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -44,90 +45,89 @@
 </div>
 
 <div id="market" class="tabs active">
-    <div style="display:flex; justify-content:space-between; align-items:center">
-        <h2>🛒 Глобальный Маркет</h2>
-        <button onclick="loadCloud()" style="background:none; border:none; color:var(--accent); font-size:20px">🔄</button>
-    </div>
+    <h2>🛒 Глобальный Маркет</h2>
     <div id="market-list"></div>
 </div>
 
-<div id="groups" class="tabs">
-    <h2>👥 Сообщества</h2>
-    <button class="btn" onclick="createGroup()">+ Создать группу</button>
-    <div id="group-list" style="margin-top:20px"></div>
+<div id="generator" class="tabs">
+    <h2>🎨 AI Генератор</h2>
+    <div class="nft-card">
+        <p style="font-size: 13px; color: #888;">Опиши, что хочешь создать, и я сгенерирую это для тебя!</p>
+        <textarea id="gen-prompt" placeholder="Например: Золотой утка-киборг в стиле киберпанк..."></textarea>
+        <button class="btn btn-gen" onclick="generateAI()">Сгенерировать шедевр</button>
+        <div id="gen-result" style="margin-top:15px; display:none">
+            <div class="img-box" id="gen-img-box"></div>
+            <button class="btn" onclick="publishGen()">Опубликовать этот арт</button>
+        </div>
+    </div>
 </div>
 
 <div id="create" class="tabs">
-    <h2>➕ Создать NFT</h2>
+    <h2>➕ Свое NFT</h2>
     <div class="nft-card">
-        <div class="img-box" id="pre-box" onclick="document.getElementById('f').click()">📸 Выбрать фото</div>
+        <div class="img-box" id="pre-box" onclick="document.getElementById('f').click()">📸 Загрузить (NFTzet)</div>
         <input type="file" id="f" style="display:none" onchange="handleFile(this)">
-        <input type="text" id="nn" placeholder="Название NFT">
-        <textarea id="nd" placeholder="Описание..."></textarea>
-        <div style="display:flex; gap:10px">
-            <input type="number" id="np" placeholder="Цена" style="flex:2">
-            <select id="nc" style="flex:1"><option>TON</option><option>NFcoin</option></select>
-        </div>
+        <input type="text" id="nn" placeholder="Название">
         <button class="btn" onclick="publish(false)">Опубликовать</button>
-        <button class="btn btn-sec" onclick="publish(true)">Создать бесплатно</button>
     </div>
 </div>
 
 <div id="profile" class="tabs">
     <div style="text-align:center; padding: 25px; background: var(--card); border-radius: 25px;">
-        <div id="p-ava" onclick="editAva()" style="width:90px; height:90px; background:var(--accent); border-radius:50%; margin:0 auto 15px; font-size:45px; line-height:90px; cursor:pointer;">👤</div>
-        <h2 id="p-name" onclick="editName()" style="margin:0; cursor:pointer">User</h2>
-        <p id="p-sub" style="color:var(--accent); font-size:12px; font-weight:bold; margin-top:5px"></p>
+        <div id="p-ava" onclick="editName()" style="width:80px; height:80px; background:var(--accent); border-radius:50%; margin:0 auto 10px; font-size:40px; line-height:80px;">👤</div>
+        <h2 id="p-name">User</h2>
+        <p id="p-sub" style="color:var(--accent); font-weight:bold;"></p>
+        <button class="btn" onclick="openNickPicker()">NFT в ник</button>
     </div>
-    <h3>🛍 Мои NFT</h3>
+    <h3>🛍 Моя Коллекция</h3>
     <div id="bought-list"></div>
 </div>
 
 <div id="settings" class="tabs">
     <h2>⚙️ Настройки</h2>
-    <div class="setting-row" onclick="toggleOption('inc')"><span>👤 Инкогнито</span><span class="setting-val" id="s-inc">ВЫКЛ</span></div>
-    <div class="setting-row" onclick="toggleOption('priv')"><span>🔒 Приватность</span><span class="setting-val" id="s-priv">ВЫКЛ</span></div>
-    <div class="setting-row" onclick="toggleOption('theme')"><span>🌓 Тема</span><span class="setting-val" id="s-theme">ТЕМНАЯ</span></div>
-    <div class="setting-row" onclick="toggleOption('lang')"><span>🌐 Язык</span><span class="setting-val" id="s-lang">РУССКИЙ</span></div>
-    <div class="setting-row" onclick="openSupport()"><span>🛠 Поддержка</span><span class="setting-val">ОТКРЫТЬ</span></div>
+    <div class="setting-row" onclick="toggle('inc')"><span>👤 Инкогнито</span><span id="s-inc" class="setting-val">ВЫКЛ</span></div>
+    <div class="setting-row" onclick="toggle('priv')"><span>🔒 Приватность</span><span id="s-priv" class="setting-val">ВЫКЛ</span></div>
+    <div class="setting-row" onclick="toggle('theme')"><span>🌓 Тема</span><span id="s-theme" class="setting-val">ТЕМНАЯ</span></div>
+    <div class="setting-row" onclick="toggle('lang')"><span>🌐 Язык</span><span id="s-lang" class="setting-val">РУССКИЙ</span></div>
+    <div class="setting-row" onclick="tg.showAlert('Поддержка: @NFTzet_Support')"><span>🛠 Поддержка</span><span class="setting-val">ОТКРЫТЬ</span></div>
     <button class="btn btn-sec" onclick="location.reload()">🔄 Обновить</button>
 </div>
 
-<div id="support-modal" class="modal">
+<div id="nick-modal" class="modal">
     <div class="modal-content">
-        <h3>🆘 Поддержка</h3>
-        <textarea id="sup-msg" placeholder="Опишите проблему..."></textarea>
-        <button class="btn" onclick="sendSupport()">Отправить</button>
-        <button class="btn btn-sec" onclick="closeSupport()">Закрыть</button>
+        <h3>Выбери NFT</h3>
+        <div id="nick-list-picker"></div>
+        <button class="btn btn-sec" onclick="closeNickPicker()">Закрыть</button>
     </div>
 </div>
 
 <nav class="nav">
     <div class="nav-item active" onclick="tab('market', this)">🛒</div>
-    <div class="nav-item" onclick="tab('groups', this)">👥</div>
+    <div class="nav-item" onclick="tab('generator', this)">🎨</div>
     <div class="nav-item" onclick="tab('create', this)">➕</div>
     <div class="nav-item" onclick="tab('profile', this)">👤</div>
     <div class="nav-item" onclick="tab('settings', this)">⚙️</div>
 </nav>
+
+<canvas id="canvas" style="display:none"></canvas>
 
 <script>
     const tg = window.Telegram.WebApp;
     const CLOUD_URL = "https://api.jsonbin.io/v3/b/65fd5a7a1f5677401f4142e8"; 
     const API_KEY = "$2a$10$7XyH/zH2I2.M2.M1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1";
 
-    let store = JSON.parse(localStorage.getItem('NFT_ULTRA_SYNC')) || {
-        bal: {ton: 0, nf: 100}, bought: [], theme: 'dark', lang: 'ru', inc: false, priv: false,
+    let store = JSON.parse(localStorage.getItem('NFT_PRIVACY_V1')) || {
+        bal: {ton: 0, nf: 100}, bought: [], theme: 'dark', inc: false, priv: false, lang: 'ru',
         user: { name: tg.initDataUnsafe?.user?.first_name || "User", ava: "👤", nickNFT: "" }
     };
     let globalMarket = { items: [], groups: [] };
+    let tempImg = "";
 
     async function loadCloud() {
         try {
-            const res = await fetch(`${CLOUD_URL}/latest`, { headers: { "X-Master-Key": API_KEY } });
-            const data = await res.json();
-            globalMarket = data.record;
-            updateUI();
-        } catch (e) { console.error("Облако временно недоступно"); }
+            const r = await fetch(`${CLOUD_URL}/latest`, { headers: { "X-Master-Key": API_KEY } });
+            const d = await r.json(); globalMarket = d.record; updateUI();
+        } catch(e) { console.log("Cloud sync error"); }
     }
 
     async function syncCloud() {
@@ -139,115 +139,133 @@
         loadCloud();
     }
 
-    function save() { localStorage.setItem('NFT_ULTRA_SYNC', JSON.stringify(store)); updateUI(); }
-    setInterval(() => { store.bal.ton += 1; store.bal.nf += 10; save(); }, 60000);
+    function save() { localStorage.setItem('NFT_PRIVACY_V1', JSON.stringify(store)); updateUI(); }
+
+    function handleFile(f) {
+        const reader = new FileReader();
+        reader.onload = (e) => { addWatermark(e.target.result); };
+        reader.readAsDataURL(f.files[0]);
+    }
+
+    function addWatermark(src) {
+        const img = new Image();
+        img.onload = () => {
+            const cvs = document.getElementById('canvas');
+            const ctx = cvs.getContext('2d');
+            cvs.width = 500; cvs.height = 500;
+            ctx.drawImage(img, 0, 0, 500, 500);
+            ctx.fillStyle = "rgba(255,255,255,0.5)";
+            ctx.font = "bold 30px Arial";
+            ctx.fillText("NFTzet", 20, 470);
+            tempImg = cvs.toDataURL("image/jpeg", 0.7);
+            document.getElementById('pre-box').innerHTML = `<img src="${tempImg}">`;
+        };
+        img.src = src;
+    }
+
+    async function generateAI() {
+        const prompt = document.getElementById('gen-prompt').value;
+        if(!prompt) return tg.showAlert("Опиши словами картинку!");
+        tg.showAlert("Искусственный интеллект начал работу... Подожди 5 секунд.");
+        
+        // Эмуляция генерации (в реальности — запрос к API Gemini)
+        setTimeout(() => {
+            // Для примера используем абстрактную картинку, но ты можешь попросить МЕНЯ сгенерировать и вставить её сюда
+            const placeholderImg = "https://picsum.photos/500/500?random=" + Date.now();
+            document.getElementById('gen-result').style.display = 'block';
+            document.getElementById('gen-img-box').innerHTML = `<img src="${placeholderImg}" id="ai-img">`;
+            tg.showAlert("Готово! Наложил водяной знак NFTzet.");
+        }, 3000);
+    }
+
+    async function publishGen() {
+        const aiImg = document.getElementById('ai-img').src;
+        addWatermark(aiImg); // Накладываем знак
+        setTimeout(async () => {
+            const item = { id: Date.now(), name: "AI Art", img: tempImg, price: 5, cur: 'TON', reviews: [] };
+            globalMarket.items.unshift(item);
+            await syncCloud();
+            tg.showAlert("AI NFT опубликовано!");
+            tab('market', document.querySelectorAll('.nav-item')[0]);
+        }, 500);
+    }
+
+    async function publish() {
+        const name = document.getElementById('nn').value;
+        if(!name || !tempImg) return tg.showAlert("Загрузи фото!");
+        const item = { id: Date.now(), name, img: tempImg, price: 10, cur: 'NFcoin', reviews: [] };
+        globalMarket.items.unshift(item);
+        await syncCloud();
+        tg.showAlert("Опубликовано!");
+        tab('market', document.querySelectorAll('.nav-item')[0]);
+    }
 
     function updateUI() {
         document.getElementById('bal-ton').innerText = store.bal.ton.toFixed(2);
         document.getElementById('bal-nf').innerText = store.bal.nf;
-        
         document.getElementById('p-name').innerText = store.inc ? "Anonymous" : store.user.name;
-        document.getElementById('p-ava').innerText = store.inc ? "🕶" : store.user.ava;
-        document.getElementById('p-sub').innerText = store.user.nickNFT ? `STATUS: ${store.user.nickNFT}` : "";
-        
+        document.getElementById('p-sub').innerText = store.user.nickNFT ? `[${store.user.nickNFT}]` : "";
         document.getElementById('s-inc').innerText = store.inc ? "ВКЛ" : "ВЫКЛ";
         document.getElementById('s-priv').innerText = store.priv ? "ВКЛ" : "ВЫКЛ";
         document.getElementById('s-theme').innerText = store.theme === 'dark' ? "ТЕМНАЯ" : "СВЕТЛАЯ";
         document.getElementById('s-lang').innerText = store.lang === 'ru' ? "РУССКИЙ" : "EN";
-        
         document.body.className = store.theme === 'light' ? 'light' : '';
-        renderMarket(); renderBought(); renderGroups();
-    }
-
-    function handleFile(input) {
-        const reader = new FileReader();
-        reader.onload = (e) => { document.getElementById('pre-box').innerHTML = `<img src="${e.target.result}">`; };
-        reader.readAsDataURL(input.files[0]);
-    }
-
-    async function publish(free) {
-        const name = document.getElementById('nn').value;
-        const img = document.getElementById('pre-box').innerHTML;
-        if(!name || img.includes("Выбрать")) return tg.showAlert("Заполни все поля!");
-        
-        const newItem = { 
-            id: Date.now(), name, img, 
-            price: free ? 0 : (document.getElementById('np').value || 0), 
-            cur: document.getElementById('nc').value, 
-            author: store.user.name 
-        };
-        
-        globalMarket.items.unshift(newItem);
-        await syncCloud();
-        tg.showAlert("Готово! NFT в облаке.");
-        tab('market', document.querySelectorAll('.nav-item')[0]);
-    }
-
-    function buy(id) {
-        const item = globalMarket.items.find(i => i.id === id);
-        store.bought.unshift(item);
-        save();
-        tg.showAlert("Куплено! Проверь профиль.");
+        renderMarket(); renderBought();
     }
 
     function renderMarket() {
-        const list = document.getElementById('market-list');
-        list.innerHTML = '';
+        const l = document.getElementById('market-list'); l.innerHTML = '';
         globalMarket.items.forEach(i => {
-            list.innerHTML += `<div class="nft-card">
-                <div class="img-box">${i.img}</div>
+            l.innerHTML += `<div class="nft-card">
+                <div class="img-box"><img src="${i.img}"></div>
                 <h3>${i.name}</h3>
-                <button class="btn" onclick="buy(${i.id})">Купить: ${i.price} ${i.cur}</button>
+                <button class="btn" onclick="buy(${i.id})">Купить (${i.price} ${i.cur})</button>
             </div>`;
         });
+    }
+
+    function buy(id) {
+        const itm = globalMarket.items.find(i => i.id === id);
+        store.bought.unshift(itm); save();
+        tg.showAlert("Куплено!");
     }
 
     function renderBought() {
-        const list = document.getElementById('bought-list');
-        list.innerHTML = '';
+        const l = document.getElementById('bought-list'); l.innerHTML = '';
+        if(store.priv && !store.inc) { l.innerHTML = "<p>Коллекция скрыта приватностью</p>"; return; }
         store.bought.forEach(i => {
-            list.innerHTML += `<div class="nft-card">
-                <div class="img-box">${i.img}</div>
-                <h3>${i.name}</h3>
-                <button class="btn btn-sec" onclick="store.user.nickNFT='${i.name}'; save(); tg.showAlert('Ник обновлен!');">В ник</button>
-            </div>`;
+            l.innerHTML += `<div class="nft-card"><div class="img-box"><img src="${i.img}"></div><h3>${i.name}</h3></div>`;
         });
     }
 
-    function renderGroups() {
-        const list = document.getElementById('group-list');
-        list.innerHTML = '';
-        globalMarket.groups.forEach(g => { list.innerHTML += `<div class="nft-card" style="padding:15px"><b>👥 ${g}</b></div>`; });
+    function openNickPicker() {
+        const l = document.getElementById('nick-list-picker'); l.innerHTML = '';
+        store.bought.forEach(i => {
+            l.innerHTML += `<div class="setting-row" onclick="setNick('${i.name}')"><span>${i.name}</span><span class="setting-val">Выбрать</span></div>`;
+        });
+        document.getElementById('nick-modal').style.display = 'flex';
     }
 
-    async function createGroup() {
-        const g = prompt("Название новой группы:");
-        if(g) { globalMarket.groups.push(g); await syncCloud(); }
-    }
-
-    function toggleOption(type) {
-        if(type==='theme') store.theme = store.theme==='dark'?'light':'dark';
-        if(type==='inc') store.inc = !store.inc;
-        if(type==='priv') store.priv = !store.priv;
-        if(type==='lang') store.lang = store.lang==='ru'?'en':'ru';
-        save();
-    }
+    function setNick(n) { store.user.nickNFT = n; save(); closeNickPicker(); }
+    function closeNickPicker() { document.getElementById('nick-modal').style.display = 'none'; }
 
     function tab(id, el) {
         document.querySelectorAll('.tabs').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        el.classList.add('active');
+        document.getElementById(id).classList.add('active'); el.classList.add('active');
     }
 
-    function editName() { const n = prompt("Твое имя:", store.user.name); if(n) {store.user.name = n; save();} }
-    function editAva() { const a = prompt("Эмодзи аватара:", store.user.ava); if(a) {store.user.ava = a; save();} }
-    function openSupport() { document.getElementById('support-modal').style.display='flex'; }
-    function closeSupport() { document.getElementById('support-modal').style.display='none'; }
-    function sendSupport() { tg.showAlert("Сообщение отправлено!"); closeSupport(); }
+    function toggle(t) {
+        if(t==='theme') store.theme = store.theme==='dark' ? 'light' : 'dark';
+        if(t==='inc') store.inc = !store.inc;
+        if(t==='priv') store.priv = !store.priv;
+        if(t==='lang') store.lang = store.lang==='ru' ? 'en' : 'ru';
+        save();
+    }
+    
+    function editName() { const n = prompt("Имя:", store.user.name); if(n) {store.user.name = n; save();} }
 
-    loadCloud();
-    updateUI();
+    loadCloud(); updateUI();
 </script>
 </body>
 </html>

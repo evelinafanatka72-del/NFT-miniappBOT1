@@ -7,131 +7,127 @@
     <style>
         :root { --bg: #0f1218; --card: #1c212b; --text: #ffffff; --accent: #4facfe; --gold: #ffd700; --red: #ff4b4b; }
         body.light { --bg: #f0f2f5; --card: #ffffff; --text: #000000; }
-        body.oled { --bg: #000000; --card: #111; --text: #ffffff; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; transition: 0.3s; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding-bottom: 90px; transition: 0.3s; }
         
-        /* Шапка с балансом */
-        .header-stats { display: flex; justify-content: space-around; background: var(--card); padding: 15px; font-size: 13px; sticky: top; border-bottom: 1px solid #333; }
-        .stat-item span { color: var(--accent); font-weight: bold; display: block; font-size: 16px; }
+        .header-stats { display: flex; justify-content: space-around; background: var(--card); padding: 15px; border-bottom: 1px solid #333; position: sticky; top:0; z-index:100; }
+        .stat-item span { color: var(--accent); font-weight: bold; display: block; font-size: 14px; }
 
-        .tabs { display: none; padding: 15px; animation: slideUp 0.3s ease; }
+        .tabs { display: none; padding: 15px; animation: fadeIn 0.3s; }
         .tabs.active { display: block; }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Карточка товара */
         .nft-card { background: var(--card); border-radius: 20px; padding: 15px; margin-bottom: 20px; position: relative; border: 1px solid rgba(255,255,255,0.05); }
-        .badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 10px; font-size: 10px; font-weight: bold; z-index: 5; }
-        .limited { background: var(--red); color: white; }
-        .elite { background: var(--gold); color: black; box-shadow: 0 0 10px var(--gold); }
-        
-        .img-box { width: 100%; height: 250px; border-radius: 15px; overflow: hidden; position: relative; background: #252a34; margin-bottom: 10px; }
+        .img-box { width: 100%; height: 230px; border-radius: 15px; overflow: hidden; position: relative; background: #252a34; }
         .img-box img, .img-box video { width: 100%; height: 100%; object-fit: cover; }
-        .watermark { position: absolute; bottom: 10px; right: 10px; opacity: 0.4; font-size: 12px; font-weight: bold; }
-
-        /* Кнопки и инпуты */
-        .btn { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 15px; width: 100%; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-outline { background: transparent; border: 1px solid var(--accent); color: var(--accent); margin-top: 5px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 10px; background: rgba(128,128,128,0.1); border: 1px solid #444; border-radius: 12px; color: var(--text); box-sizing: border-box; }
-
-        /* Профиль */
-        .profile-header { text-align: center; padding: 20px; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); margin-bottom: 10px; object-fit: cover; }
         
-        /* Навигация */
-        .nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; padding: 15px 0; border-top: 1px solid #333; }
-        .nav-item { flex: 1; text-align: center; font-size: 11px; opacity: 0.5; transition: 0.2s; }
-        .nav-item.active { opacity: 1; color: var(--accent); transform: translateY(-5px); }
+        .watermark { position: absolute; bottom: 10px; right: 10px; opacity: 0.5; font-size: 12px; font-weight: bold; color: white; text-shadow: 1px 1px 2px black; }
+        .badge { position: absolute; top: 10px; left: 10px; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: bold; z-index: 5; }
+        .elite { background: var(--gold); color: black; box-shadow: 0 0 10px var(--gold); }
+        .limited { background: var(--red); color: white; }
 
-        /* Отзывы */
-        .reviews-section { font-size: 12px; color: #aaa; border-top: 1px solid #333; margin-top: 10px; padding-top: 10px; }
+        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        .btn-sm { width: auto; padding: 5px 15px; font-size: 12px; margin-right: 5px; background: #333; }
+
+        .nav { position: fixed; bottom: 0; width: 100%; background: var(--card); display: flex; padding: 15px 0; border-top: 1px solid #333; z-index: 1000; }
+        .nav-item { flex: 1; text-align: center; font-size: 11px; opacity: 0.5; }
+        .nav-item.active { opacity: 1; color: var(--accent); }
+
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 10px; background: #111; border: 1px solid #444; border-radius: 12px; color: white; box-sizing: border-box; }
     </style>
 </head>
-<body id="body">
+<body>
 
 <div class="header-stats">
-    <div class="stat-item">TON<span id="bal-ton">1.50</span></div>
-    <div class="stat-item">NFcoin<span id="bal-nf">2500</span></div>
-    <div class="stat-item">LTFER<span id="bal-ltfer">0.00</span></div>
+    <div class="stat-item">TON<span id="bal-ton">0.00</span></div>
+    <div class="stat-item">NFcoin<span id="bal-nf">0</span></div>
+    <div class="stat-item">LTFER<span id="bal-ltfer">0</span></div>
 </div>
 
 <div id="market" class="tabs active">
-    <div style="display:flex; justify-content:space-between; align-items:center">
-        <h2>Маркет</h2>
-        <button class="btn" style="width:auto; padding:5px 15px" onclick="earnMoney()">+ Заработать</button>
+    <h2>🛒 Маркет</h2>
+    <div id="market-list"></div>
+</div>
+
+<div id="quests" class="tabs">
+    <h2>💰 Задания</h2>
+    <div class="nft-card">
+        <b>Подписка на канал</b><br><small>+280 NFcoin</small>
+        <button class="btn" onclick="addReward('nf', 280, this)">Выполнить</button>
     </div>
-    <div id="market-list">
-        <div class="nft-card">
-            <div class="badge elite">ELITE</div>
-            <div class="img-box">
-                <div style="width:100%; height:100%; background: linear-gradient(45deg, #ff3cac, #784ba0);"></div>
-                <div class="watermark">NFTzet</div>
-            </div>
-            <h3>Первый Лот</h3>
-            <p>Стартовый NFT проекта.</p>
-            <button class="btn" onclick="buyNFT(100, 'NFcoin')">Купить за 100 NFcoin</button>
-        </div>
+    <div class="nft-card">
+        <b>Пригласить друга</b><br><small>+1 TON</small>
+        <button class="btn" onclick="addReward('ton', 1, this)">Выполнить</button>
+    </div>
+    <div class="nft-card">
+        <b>Активность 24ч</b><br><small>+8000 LTFER</small>
+        <button class="btn" onclick="addReward('ltfer', 8000, this)">Получить</button>
     </div>
 </div>
 
 <div id="create" class="tabs">
-    <h2>Создание NFT</h2>
+    <h2>➕ Создать NFT</h2>
     <div class="nft-card">
         <div class="img-box" id="pre-box" onclick="document.getElementById('f').click()">
-            <div style="text-align:center; padding-top:100px">Загрузить фото/видео</div>
+            <div style="text-align:center; padding-top:100px">Нажми, чтобы загрузить</div>
         </div>
-        <input type="file" id="f" style="display:none" onchange="preview(this)">
-        <input type="text" id="nn" placeholder="Название">
-        <textarea id="nd" placeholder="Описание"></textarea>
-        <div style="display:flex; gap:10px">
-            <input type="number" id="np" placeholder="Цена">
-            <select id="nc"><option>TON</option><option>NFcoin</option><option>LTFER</option></select>
-        </div>
-        <div style="margin-top:10px">
-            <label><input type="checkbox" id="is-l" style="width:auto"> Лимитированный (LIMITED)</label><br>
-            <label><input type="checkbox" id="is-e" style="width:auto"> Сделать ELITE (1000 NFcoin)</label>
-        </div>
-        <button class="btn" onclick="publish()">Опубликовать в Маркет</button>
-        <button class="btn btn-outline" onclick="publish(true)">Сделать бесплатным</button>
+        <input type="file" id="f" style="display:none" onchange="handleFile(this)">
+        <input type="text" id="nn" placeholder="Название NFT">
+        <input type="number" id="np" placeholder="Цена">
+        <select id="nc"><option>NFcoin</option><option>TON</option><option>LTFER</option></select>
+        <label style="display:block; margin-top:15px"><input type="checkbox" id="is-e"> Статус ELITE (1000 NFcoin)</label>
+        <label style="display:block; margin-top:5px"><input type="checkbox" id="is-l"> LIMITED Edition</label>
+        <button class="btn" onclick="publish()">Опубликовать</button>
     </div>
 </div>
 
 <div id="profile" class="tabs">
-    <div class="profile-header">
-        <img src="https://via.placeholder.com/100" class="avatar" id="p-ava">
-        <h2 id="p-name">Пользователь</h2>
-        <p id="p-status" style="color:#888">NFT Коллекционер</p>
-        <div style="display:flex; justify-content:center; gap:20px">
-            <div><b>0</b><br>Подписки</div>
-            <div><b>0</b><br>Лайки</div>
-        </div>
+    <div style="text-align:center; padding: 20px;">
+        <div id="prof-ava" style="width:80px; height:80px; background:var(--accent); border-radius:50%; margin: 0 auto 10px auto; line-height:80px; font-size:30px;">👤</div>
+        <h2 id="prof-name">Пользователь</h2>
+        <p id="prof-status" style="color:#888;">Статус: Новичок</p>
     </div>
-    <h3>Мои NFT</h3>
+    <h3>Моя коллекция</h3>
     <div id="my-nfts"></div>
 </div>
 
 <div id="settings" class="tabs">
-    <h2>Настройки</h2>
-    <div class="nft-card" onclick="toggleIncognito()">👤 Режим инкогнито: <b id="inc-st">ВЫКЛ</b></div>
-    <div class="nft-card" onclick="togglePrivate()">🔒 Приватный аккаунт: <b id="priv-st">ВЫКЛ</b></div>
-    <div class="nft-card" onclick="toggleTheme()">🌓 Сменить тему</div>
-    <div class="nft-card" onclick="tg.showAlert('Жалоба принята в обработку!')">🛠 Служба поддержки</div>
-    <div class="nft-card" onclick="location.reload()">🔄 Перезагрузить</div>
+    <h2>⚙️ Настройки</h2>
+    <button class="btn" style="background:#333" onclick="toggleIncognito()">Режим инкогнито: <span id="inc-label">ВЫКЛ</span></button>
+    <button class="btn" style="background:#333; margin-top:10px" onclick="changeLang()">Язык: <span id="lang-label">Русский</span></button>
+    <button class="btn" style="background:#444; margin-top:10px" onclick="location.reload()">🔄 Перезагрузить</button>
 </div>
 
 <nav class="nav">
-    <div class="nav-item active" onclick="tab('market', this)">🛒 Маркет</div>
-    <div class="nav-item" onclick="tab('create', this)">➕ Создать</div>
-    <div class="nav-item" onclick="tab('profile', this)">👤 Профиль</div>
-    <div class="nav-item" onclick="tab('settings', this)">⚙️ Настройки</div>
+    <div class="nav-item active" onclick="tab('market', this)">🛒</div>
+    <div class="nav-item" onclick="tab('quests', this)">💰</div>
+    <div class="nav-item" onclick="tab('create', this)">➕</div>
+    <div class="nav-item" onclick="tab('profile', this)">👤</div>
+    <div class="nav-item" onclick="tab('settings', this)">⚙️</div>
 </nav>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
+    let store = JSON.parse(localStorage.getItem('nft_pro_data')) || { bal: {ton:0, nf:500, ltfer:0}, items: [], inc: false, lang: 'RU' };
 
-    let balance = { ton: 1.5, nf: 2500, ltfer: 0 };
-    let incognito = false;
-    let isPrivate = false;
+    function save() { localStorage.setItem('nft_pro_data', JSON.stringify(store)); update(); }
+    
+    function update() {
+        document.getElementById('bal-ton').innerText = store.bal.ton.toFixed(2);
+        document.getElementById('bal-nf').innerText = store.bal.nf;
+        document.getElementById('bal-ltfer').innerText = store.bal.ltfer;
+        document.getElementById('inc-label').innerText = store.inc ? "ВКЛ" : "ВЫКЛ";
+        
+        if(store.inc) {
+            document.getElementById('prof-name').innerText = "Пользователь Z";
+            document.getElementById('prof-ava').innerText = "🕶";
+            document.getElementById('prof-status').innerText = "Аккаунт засекречен";
+        } else {
+            document.getElementById('prof-name').innerText = "Пользователь";
+            document.getElementById('prof-ava').innerText = "👤";
+            document.getElementById('prof-status').innerText = "NFT Коллекционер";
+        }
+        render();
+    }
 
     function tab(id, el) {
         document.querySelectorAll('.tabs').forEach(t => t.classList.remove('active'));
@@ -140,79 +136,60 @@
         el.classList.add('active');
     }
 
-    function earnMoney() {
-        balance.nf += 50;
-        updateBal();
-        tg.showAlert("Вы заработали 50 NFcoin за активность!");
+    function addReward(cur, val, btn) {
+        store.bal[cur] += val; btn.disabled = true; btn.innerText = "Получено"; save();
     }
 
-    function updateBal() {
-        document.getElementById('bal-ton').innerText = balance.ton.toFixed(2);
-        document.getElementById('bal-nf').innerText = balance.nf;
-        document.getElementById('bal-ltfer').innerText = balance.ltfer.toFixed(2);
-    }
-
-    function preview(input) {
-        const file = input.files[0];
+    function handleFile(input) {
         const reader = new FileReader();
         reader.onload = (e) => {
             const box = document.getElementById('pre-box');
-            box.innerHTML = file.type.includes('video') ? `<video src="${e.target.result}" autoplay loop muted playsinline></video>` : `<img src="${e.target.result}">`;
-            box.innerHTML += `<div class="watermark">NFTzet</div>`;
+            box.innerHTML = `<img src="${e.target.result}"><div class="watermark">NFTzet</div>`;
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(input.files[0]);
     }
 
-    function publish(free = false) {
+    function publish() {
         const name = document.getElementById('nn').value;
-        const price = free ? 0 : document.getElementById('np').value;
-        const curr = document.getElementById('nc').value;
-        const isElite = document.getElementById('is-e').checked;
-        const isLim = document.getElementById('is-l').checked;
+        const elite = document.getElementById('is-e').checked;
+        if(elite && store.bal.nf < 1000) return tg.showAlert("Нужно 1000 NFcoin для ELITE!");
+        if(elite) store.bal.nf -= 1000;
 
-        if(!name) return tg.showAlert("Введите название!");
-        if(isElite && balance.nf < 1000) return tg.showAlert("Недостаточно NFcoin для ELITE!");
-
-        if(isElite) { balance.nf -= 1000; updateBal(); }
-
-        const nftHtml = `
-            <div class="nft-card">
-                ${isElite ? '<div class="badge elite">ELITE</div>' : ''}
-                ${isLim ? '<div class="badge limited" style="left:auto; right:15px">LIMITED</div>' : ''}
-                <div class="img-box">${document.getElementById('pre-box').innerHTML}</div>
-                <h3>${name}</h3>
-                <p>${document.getElementById('nd').value}</p>
-                <div class="reviews-section">💬 Отзывов пока нет. Будь первым!</div>
-                <button class="btn" onclick="buyNFT(${price}, '${curr}')">Купить: ${price} ${curr}</button>
-            </div>`;
-        
-        document.getElementById('market-list').insertAdjacentHTML('afterbegin', nftHtml);
-        tab('market', document.querySelectorAll('.nav-item')[0]);
-        tg.showAlert("NFT Опубликован!");
+        const item = { 
+            name, elite, 
+            price: document.getElementById('np').value, 
+            cur: document.getElementById('nc').value,
+            lim: document.getElementById('is-l').checked,
+            img: document.getElementById('pre-box').innerHTML 
+        };
+        store.items.unshift(item);
+        save(); tab('market', document.querySelectorAll('.nav-item')[0]);
     }
 
-    function buyNFT(p, c) {
-        tg.showConfirm(`Купить этот NFT за ${p} ${c}?`, (ok) => {
-            if(ok) tg.showAlert("Покупка совершена! NFT добавлен в профиль.");
+    function render() {
+        const list = document.getElementById('market-list');
+        list.innerHTML = '';
+        store.items.forEach(i => {
+            list.innerHTML += `
+                <div class="nft-card">
+                    ${i.elite ? '<div class="badge elite">ELITE</div>' : ''}
+                    ${i.lim ? '<div class="badge limited" style="left:auto; right:10px">LIMITED</div>' : ''}
+                    <div class="img-box">${i.img}</div>
+                    <h3>${i.name}</h3>
+                    <div style="margin-bottom:10px">
+                        <button class="btn btn-sm" onclick="tg.showAlert('❤️ Лайк поставлен!')">❤️</button>
+                        <button class="btn btn-sm" onclick="tg.showPopup({title:'Отзывы', message:'Пока нет отзывов.'})">💬</button>
+                        <button class="btn btn-sm" onclick="tg.showAlert('Жалоба отправлена')">⚠️</button>
+                    </div>
+                    <button class="btn" onclick="tg.showConfirm('Купить?')">Купить: ${i.price} ${i.cur}</button>
+                </div>`;
         });
     }
 
-    function toggleIncognito() {
-        incognito = !incognito;
-        document.getElementById('inc-st').innerText = incognito ? "ВКЛ" : "ВЫКЛ";
-        document.getElementById('p-name').innerText = incognito ? "Пользователь Z" : "Пользователь";
-        document.getElementById('p-ava').src = incognito ? "https://img.icons8.com/ios-filled/100/4facfe/spy.png" : "https://via.placeholder.com/100";
-        if(incognito) document.getElementById('p-status').innerText = "Аккаунт засекречен 🕶";
-    }
+    function toggleIncognito() { store.inc = !store.inc; save(); }
+    function changeLang() { store.lang = store.lang === 'RU' ? 'EN' : 'RU'; document.getElementById('lang-label').innerText = store.lang === 'RU' ? 'Русский' : 'English'; save(); }
 
-    function togglePrivate() {
-        isPrivate = !isPrivate;
-        document.getElementById('priv-st').innerText = isPrivate ? "ВКЛ" : "ВЫКЛ";
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle('oled');
-    }
+    update();
 </script>
 </body>
 </html>

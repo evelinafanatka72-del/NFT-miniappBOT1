@@ -2,484 +2,516 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NFTzet OMNI-ULTIMATUM V7.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NFTzet OMNI-GOD-MODE V8.0</title>
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     
     <style>
         /* * ==========================================
-         * 1. ГЛОБАЛЬНЫЙ ДИЗАЙН СИСТЕМЫ
-         * ========================================== */
+         * 1. ЯДРО ДИЗАЙНА И ПЕРЕМЕННЫЕ (GOD MODE)
+         * ========================================== 
+         */
         :root { 
-            --bg: #0a0c10; 
-            --card: #161a23; 
-            --card-accent: #1f2430;
+            --bg: #030508; 
+            --card: #11141b; 
+            --card-accent: #1a1f29;
             --text: #ffffff; 
-            --text-muted: #a0a0ab;
+            --text-muted: #7d8491;
             --accent: #0088cc; 
             --accent-lite: #4facfe;
             --gradient: linear-gradient(135deg, #0088cc 0%, #4facfe 100%);
-            --danger: #ff453a; 
-            --success: #32d74b;
-            --warning: #ffd60a;
-            --stars: #febd2e;
-            --premium: #bf5af2;
+            --danger: #ff3b30; 
+            --success: #34c759;
+            --warning: #ffcc00;
+            --premium: #af52de;
             
-            /* Цвета редкости */
-            --common: #8e8e93;
-            --rare: #0a84ff;
-            --epic: #bf5af2;
-            --legendary: #ff9f0a;
+            /* Редкости (Rarity Engine 2.0) */
+            --r-common: #8e8e93;
+            --r-rare: #007aff;
+            --r-epic: #af52de;
+            --r-legendary: #ff9500;
+            --r-god: #ff0000; /* God Mode Red */
         }
 
         body { 
             background: var(--bg); color: var(--text); 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            margin: 0; padding-bottom: 120px; 
-            overflow-x: hidden; -webkit-font-smoothing: antialiased;
-            user-select: none;
+            font-family: -apple-system, system-ui, sans-serif; 
+            margin: 0; padding: 0; padding-bottom: env(safe-area-inset-bottom, 120px);
+            overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
         /* * ==========================================
-         * 2. ЭФФЕКТЫ И АНИМАЦИИ
-         * ========================================== */
-        @keyframes shine {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(100%); }
+         * 2. ДИНАМИЧЕСКИЕ АНИМАЦИИ
+         * ========================================== 
+         */
+        @keyframes bg-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        @keyframes pulse-red {
-            0% { box-shadow: 0 0 0 0 rgba(255, 69, 58, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 69, 58, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 69, 58, 0); }
+        @keyframes troll-shake {
+            0% { transform: translate(0,0); }
+            25% { transform: translate(2px, -2px); }
+            50% { transform: translate(-2px, 2px); }
+            100% { transform: translate(0,0); }
+        }
+
+        .animated-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(-45deg, #05070a, #0d1117, #05070a);
+            background-size: 400% 400%; z-index: -1; animation: bg-flow 15s ease infinite;
         }
 
         /* * ==========================================
-         * 3. ШАПКА И ПРОГРЕСС
-         * ========================================== */
-        .main-header {
-            background: rgba(22, 26, 35, 0.8);
-            backdrop-filter: blur(20px);
-            padding: 20px;
+         * 3. УЛЬТРА-ШАПКА (DASHBOARD)
+         * ========================================== 
+         */
+        .header-main {
+            background: rgba(17, 20, 27, 0.85);
+            backdrop-filter: blur(25px); padding: 20px;
             position: sticky; top: 0; z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
 
-        .user-row { display: flex; justify-content: space-between; align-items: center; }
-        .lvl-pill { 
-            background: var(--warning); color: #000; 
-            padding: 2px 8px; border-radius: 8px; 
-            font-size: 11px; font-weight: 900; margin-left: 8px;
-        }
+        .top-info { display: flex; justify-content: space-between; align-items: flex-start; }
+        .user-meta b { font-size: 20px; letter-spacing: -0.5px; }
+        .badge-lvl { background: var(--gradient); color: white; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; margin-left: 5px; vertical-align: middle; }
 
-        .xp-container { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        .xp-fill { height: 100%; background: var(--gradient); width: 0%; transition: 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .xp-wrapper { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 15px 0; overflow: hidden; }
+        .xp-progress { height: 100%; background: var(--gradient); width: 0%; transition: 1s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 0 0 10px var(--accent-lite); }
+
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .stat-card { background: var(--card-accent); padding: 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.03); text-align: center; }
+        .stat-card span { font-size: 9px; color: var(--text-muted); display: block; text-transform: uppercase; }
+        .stat-card b { font-size: 14px; color: var(--accent-lite); display: block; margin-top: 4px; }
 
         /* * ==========================================
-         * 4. КОШЕЛЕК
-         * ========================================== */
-        .wallets-box { display: flex; gap: 12px; overflow-x: auto; margin-top: 15px; padding-bottom: 5px; scrollbar-width: none; }
-        .wallets-box::-webkit-scrollbar { display: none; }
-        .wallet-card { 
-            min-width: 115px; background: var(--card-accent); 
-            padding: 12px; border-radius: 18px; 
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.2s;
-        }
-        .wallet-card:active { transform: scale(0.95); background: var(--card); }
-        .wallet-card span { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-        .wallet-card b { display: block; font-size: 16px; margin-top: 4px; color: var(--accent-lite); }
+         * 4. МАРКЕТПЛЕЙС (AVITO 2.0)
+         * ========================================== 
+         */
+        .section-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .section-header h2 { margin: 0; font-size: 22px; font-weight: 900; }
 
-        /* * ==========================================
-         * 5. КАРТОЧКИ NFT (ULTRA STYLE)
-         * ========================================== */
-        .nft-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
-        
-        .nft-item {
-            background: var(--card); border-radius: 22px; overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.06);
-            position: relative; transition: all 0.3s ease;
-        }
-        .nft-item:active { transform: scale(0.97); }
+        .nft-masonry { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px; }
 
-        .nft-image-wrapper { width: 100%; height: 160px; position: relative; background: #000; }
+        .nft-box {
+            background: var(--card); border-radius: 24px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.06); position: relative;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nft-box:active { transform: translateY(5px) scale(0.96); }
+
+        .nft-preview { width: 100%; height: 170px; position: relative; background: #000; }
         .nft-img { width: 100%; height: 100%; object-fit: cover; }
         
-        .rarity-tag {
-            position: absolute; top: 10px; left: 10px;
-            padding: 4px 10px; border-radius: 10px;
-            font-size: 9px; font-weight: 800; text-transform: uppercase;
-            backdrop-filter: blur(8px); color: white;
+        .rarity-label {
+            position: absolute; top: 12px; left: 12px;
+            padding: 4px 10px; border-radius: 10px; font-size: 9px;
+            font-weight: 900; color: white; text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        .item-info { padding: 12px; }
-        .item-name { font-size: 14px; font-weight: 700; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .item-author { font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block; }
+        .nft-details { padding: 15px; }
+        .nft-title { font-size: 15px; font-weight: 700; margin: 0; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .nft-author { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
         
-        .price-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);
+        .nft-footer { 
+            margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center;
         }
-        .price-val { font-size: 13px; font-weight: 800; color: var(--accent-lite); }
+        .nft-price { font-weight: 900; color: var(--accent-lite); font-size: 14px; }
 
-        /* Свечение редкости */
-        .rare-glow { box-shadow: 0 0 15px rgba(10, 132, 255, 0.2); border-color: var(--rare); }
-        .epic-glow { box-shadow: 0 0 15px rgba(191, 90, 242, 0.2); border-color: var(--epic); }
-        .leg-glow { box-shadow: 0 0 20px rgba(255, 159, 10, 0.3); border-color: var(--legendary); }
+        /* GLOW EFFECTS */
+        .glow-legendary { box-shadow: 0 0 20px rgba(255, 149, 0, 0.2); border-color: var(--r-legendary); }
+        .glow-god { box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); border-color: var(--r-god); animation: troll-shake 0.1s infinite; }
 
         /* * ==========================================
-         * 6. БЕЗОПАСНОСТЬ (12,280 УСТРОЙСТВ)
-         * ========================================== */
-        .security-banner {
-            background: rgba(255, 69, 58, 0.1);
-            border: 1px solid var(--danger);
-            border-radius: 20px;
-            margin: 15px; padding: 20px;
-            animation: pulse-red 2s infinite;
+         * 5. SECURITY HUB (12,280 DEVICES)
+         * ========================================== 
+         */
+        .security-hub {
+            background: linear-gradient(135deg, rgba(255,59,48,0.15) 0%, rgba(0,0,0,0) 100%);
+            border: 1px solid var(--danger); margin: 15px; padding: 20px; border-radius: 25px;
+            position: relative; overflow: hidden;
         }
+        .security-hub::after {
+            content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: rotate(45deg); animation: shine 3s infinite;
+        }
+        @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
 
-        .device-count { font-size: 28px; font-weight: 900; color: var(--danger); display: block; }
+        .hub-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--danger); font-weight: 900; }
+        .hub-count { font-size: 36px; font-weight: 950; display: block; margin: 5px 0; }
+        .hub-status { font-size: 12px; color: var(--success); display: flex; align-items: center; gap: 5px; }
 
         /* * ==========================================
-         * 7. ФОРМЫ И КНОПКИ
-         * ========================================== */
-        .input-field {
+         * 6. КОНСТРУКТОР NFT
+         * ========================================== 
+         */
+        .editor-container { padding: 0 20px; }
+        .upload-area {
+            width: 100%; height: 240px; border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 30px; background: var(--card);
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; cursor: pointer; transition: 0.3s;
+        }
+        .upload-area:hover { border-color: var(--accent); background: var(--card-accent); }
+
+        .input-group { margin-top: 20px; }
+        .input-group label { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; display: block; padding-left: 5px; }
+        
+        .main-input {
             width: 100%; background: var(--card-accent); border: 1px solid rgba(255,255,255,0.05);
-            padding: 16px; border-radius: 18px; color: white; margin-bottom: 15px;
-            font-size: 15px; outline: none; box-sizing: border-box;
+            padding: 18px; border-radius: 20px; color: white; font-size: 16px; outline: none; box-sizing: border-box;
         }
+        .main-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(0, 136, 204, 0.2); }
 
-        .btn-action {
-            width: 100%; padding: 18px; border-radius: 20px; border: none;
-            font-weight: 800; font-size: 16px; cursor: pointer; transition: 0.3s;
-            margin-bottom: 10px;
+        .action-btn {
+            width: 100%; padding: 20px; border-radius: 22px; border: none;
+            font-weight: 900; font-size: 16px; margin-top: 15px; transition: 0.3s;
         }
-        .btn-main { background: var(--gradient); color: white; box-shadow: 0 8px 20px rgba(0, 136, 204, 0.3); }
-        .btn-ghost { background: var(--success); color: white; }
+        .btn-prime { background: var(--gradient); color: white; }
+        .btn-free { background: rgba(52, 199, 89, 0.1); color: var(--success); border: 1px solid var(--success); }
 
         /* * ==========================================
-         * 8. НАВИГАЦИЯ
-         * ========================================== */
-        .nav-bar {
+         * 7. ПАНЕЛЬ НАВИГАЦИИ (GLASS)
+         * ========================================== 
+         */
+        .bottom-nav {
             position: fixed; bottom: 0; width: 100%;
-            background: rgba(22, 26, 35, 0.95);
-            backdrop-filter: blur(15px);
-            display: flex; padding: 15px 0 35px;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            z-index: 2000;
+            background: rgba(17, 20, 27, 0.9); backdrop-filter: blur(20px);
+            display: flex; padding: 15px 0 40px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 5000;
         }
-        .nav-item { flex: 1; text-align: center; font-size: 24px; opacity: 0.3; transition: 0.3s; }
-        .nav-item.active { opacity: 1; color: var(--accent-lite); transform: translateY(-8px); }
+        .nav-link { flex: 1; text-align: center; font-size: 26px; opacity: 0.25; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .nav-link.active { opacity: 1; color: var(--accent-lite); transform: translateY(-10px) scale(1.2); }
 
-        .page { display: none; padding: 10px 5px; }
-        .page.active { display: block; animation: slideUp 0.4s ease; }
+        .page { display: none; }
+        .page.active { display: block; animation: pageEnter 0.5s ease; }
+        @keyframes pageEnter { from { opacity: 0; transform: scale(0.98) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* ACHIEVEMENTS */
+        .achieve-row { display: flex; gap: 10px; padding: 0 20px; overflow-x: auto; scrollbar-width: none; }
+        .achieve-badge { min-width: 60px; height: 60px; border-radius: 50%; background: var(--card-accent); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* РЕЙТИНГ */
-        .leader-item {
-            display: flex; align-items: center; gap: 15px;
-            padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
     </style>
 </head>
 <body>
 
-    <header class="main-header">
-        <div class="user-row">
-            <div>
-                <span style="color:var(--text-muted); font-size:12px">Профиль NFTzet</span>
-                <div style="display:flex; align-items:center">
-                    <b id="h-username" style="font-size:18px">...</b>
-                    <span class="lvl-pill">LVL <span id="h-level">1</span></span>
-                </div>
+    <div class="animated-bg"></div>
+
+    <header class="header-main">
+        <div class="top-info">
+            <div class="user-meta">
+                <span style="color:var(--text-muted); font-size:12px">Привет, разработчик</span><br>
+                <b id="h-name">...</b><span class="badge-lvl">LVL <span id="h-lvl">1</span></span>
             </div>
             <div style="text-align:right">
-                <span style="color:var(--stars); font-size:14px">★ <b id="h-stars">0</b></span>
+                <div style="color:var(--stars); font-weight:900">★ <span id="h-stars">0</span></div>
+                <div style="font-size:10px; color:var(--text-muted)">PREMIUM ACTIVE</div>
             </div>
         </div>
-        <div class="xp-container"><div id="h-xp-bar" class="xp-fill"></div></div>
         
-        <div class="wallets-box">
-            <div class="wallet-card" onclick="addMoney('ton')"><span>TON Coin</span><b id="w-ton">0.00</b></div>
-            <div class="wallet-card" onclick="addMoney('nf')"><span>NFcoin</span><b id="w-nf">0</b></div>
-            <div class="wallet-card" onclick="addMoney('stars')"><span>Stars</span><b id="w-stars">0</b></div>
+        <div class="xp-wrapper"><div id="h-xp" class="xp-progress"></div></div>
+
+        <div class="stat-grid">
+            <div class="stat-card" onclick="earn('ton')"><span>TON</span><b id="w-ton">0.00</b></div>
+            <div class="stat-card" onclick="earn('nf')"><span>NFCOIN</span><b id="w-nf">0</b></div>
+            <div class="stat-card" onclick="tg.showAlert('NFTzet Points')"><span>PTS</span><b>1,240</b></div>
         </div>
     </header>
 
-    <main id="p-market" class="page active">
-        <div style="padding:15px; display:flex; justify-content:space-between; align-items:center">
-            <h2 style="margin:0">Лента Облака</h2>
-            <button onclick="syncAll()" style="background:none; border:none; color:var(--accent-lite); font-weight:bold">Обновить</button>
+    <main id="view-market" class="page active">
+        <div class="section-header">
+            <h2>Marketplace</h2>
+            <button onclick="sync()" style="background:none; border:none; color:var(--accent-lite); font-weight:800">SYNC CLOUD</button>
         </div>
-        <div id="cloud-list" class="nft-container"></div>
+        <div id="market-list" class="nft-masonry">
+            </div>
     </main>
 
-    <section id="p-rank" class="page">
-        <h2 style="padding:20px">Зал Славы 🏆</h2>
-        <div id="leaderboard" style="background:var(--card); margin:0 15px; border-radius:25px; overflow:hidden">
+    <section id="view-rank" class="page">
+        <h2 style="padding:20px">Global Leaders 🏆</h2>
+        <div id="rank-list" style="background:var(--card); margin:0 20px; border-radius:30px; overflow:hidden">
             </div>
     </section>
 
-    <section id="p-create" class="page">
-        <h2 style="padding:20px">Создать Шедевр</h2>
-        <div style="padding:0 20px">
-            <div id="drop-zone" onclick="document.getElementById('file-input').click()" style="width:100%; height:220px; border:2px dashed var(--accent); border-radius:25px; display:flex; align-items:center; justify-content:center; background:var(--card); overflow:hidden">
-                <div id="drop-text" style="text-align:center; color:var(--text-muted)">
-                    <span style="font-size:40px">🖼</span><br>Загрузите изображение
+    <section id="view-create" class="page">
+        <h2 style="padding:20px">Mint NFT</h2>
+        <div class="editor-container">
+            <div class="upload-area" onclick="document.getElementById('file-in').click()">
+                <div id="upload-preview" style="text-align:center">
+                    <span style="font-size:50px">🎨</span><br>
+                    <span style="color:var(--text-muted)">TAP TO UPLOAD</span>
                 </div>
             </div>
-            <input type="file" id="file-input" hidden accept="image/*" onchange="processFile(this)">
+            <input type="file" id="file-in" hidden accept="image/*" onchange="handleFile(this)">
 
-            <input type="text" id="in-title" class="input-field" style="margin-top:20px" placeholder="Название NFT">
-            <textarea id="in-about" class="input-field" rows="3" placeholder="Описание (история, редкость...)"></textarea>
-            
-            <div style="display:flex; gap:10px">
-                <input type="number" id="in-cost" class="input-field" placeholder="Цена">
-                <select id="in-rarity" class="input-field" style="width:140px">
-                    <option value="common">Обычный</option>
-                    <option value="rare">Редкий</option>
-                    <option value="epic">Эпик</option>
-                    <option value="legendary">Легенда</option>
+            <div class="input-group">
+                <label>NFT NAME</label>
+                <input type="text" id="in-name" class="main-input" placeholder="e.g. Yellow Duck #1">
+            </div>
+
+            <div class="input-group">
+                <label>RARITY</label>
+                <select id="in-rare" class="main-input">
+                    <option value="common">Common (Grey)</option>
+                    <option value="rare">Rare (Blue)</option>
+                    <option value="epic">Epic (Purple)</option>
+                    <option value="legendary">Legendary (Orange)</option>
+                    <option value="god">GOD MODE (Red/Troll)</option>
                 </select>
             </div>
 
-            <button class="btn-action btn-main" onclick="publish(false)">Опубликовать</button>
-            <button class="btn-action btn-ghost" onclick="publish(true)">🎁 Бесплатная раздача</button>
+            <div style="display:flex; gap:10px" class="input-group">
+                <div style="flex:2">
+                    <label>PRICE</label>
+                    <input type="number" id="in-price" class="main-input" placeholder="0.00">
+                </div>
+                <div style="flex:1">
+                    <label>CURRENCY</label>
+                    <select id="in-cur" class="main-input">
+                        <option>TON</option>
+                        <option>NF</option>
+                        <option>STARS</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="action-btn btn-prime" onclick="publishNFT(false)">MINT & SELL</button>
+            <button class="action-btn btn-free" onclick="publishNFT(true)">GIVEAWAY (FREE)</button>
         </div>
     </section>
 
-    <section id="p-profile" class="page">
-        <div class="security-banner">
-            <span style="font-size:11px; text-transform:uppercase; letter-spacing:1px">Обнаружены сессии</span>
-            <b class="device-count" id="dev-count">12,280</b>
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px">
-                <span style="font-size:12px">Статус: <b>Безопасно</b></span>
-                <button onclick="tg.showAlert('Все сессии под контролем 2FA')" style="background:var(--danger); border:none; color:white; padding:5px 12px; border-radius:8px; font-size:10px; font-weight:bold">ЗАВЕРШИТЬ ВСЕ</button>
+    <section id="view-profile" class="page">
+        <div class="security-hub">
+            <span class="hub-title">Security Alert</span>
+            <b class="hub-count">12,280</b>
+            <span style="font-size:12px; opacity:0.8">Unauthorized Sessions Detected</span>
+            <div class="hub-status" style="margin-top:10px">
+                <span style="width:8px; height:8px; background:var(--success); border-radius:50%"></span>
+                Shield Active (2FA Protected)
             </div>
         </div>
 
-        <div style="text-align:center; padding:20px">
-            <div style="width:90px; height:90px; background:var(--gradient); border-radius:50%; margin:0 auto; font-size:40px; display:flex; align-items:center; justify-content:center; box-shadow: 0 10px 30px rgba(0,0,0,0.5)">👤</div>
-            <h2 id="u-name" style="margin:15px 0 5px">Пользователь</h2>
-            <p id="u-status" style="color:var(--text-muted); font-size:12px; margin-bottom:20px">Профессиональный разработчик</p>
-            <button class="btn-action btn-main" style="width:auto; padding:10px 25px; font-size:12px" onclick="editName()">ИЗМЕНИТЬ НИК</button>
+        <div class="achieve-row">
+            <div class="achieve-badge" title="Developer">👨‍💻</div>
+            <div class="achieve-badge" title="Whale">🐋</div>
+            <div class="achieve-badge" title="Troll">🤡</div>
+            <div class="achieve-badge" title="Early Bird">🐦</div>
         </div>
 
-        <h3 style="padding:0 20px">Мои NFT (<span id="u-count">0</span>)</h3>
-        <div id="u-inventory" class="nft-container"></div>
+        <div style="text-align:center; padding:30px">
+            <div style="width:100px; height:100px; border-radius:50%; background:var(--gradient); margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:45px; box-shadow: 0 15px 40px rgba(0,0,0,0.4)">👤</div>
+            <h2 id="u-name" style="margin:20px 0 5px">User</h2>
+            <button class="action-btn" style="width:auto; padding:10px 30px; font-size:12px" onclick="editName()">EDIT PROFILE</button>
+        </div>
+
+        <div class="section-header">
+            <h3>My Collection (<span id="u-count">0</span>)</h3>
+        </div>
+        <div id="my-list" class="nft-masonry"></div>
     </section>
 
-    <nav class="nav-bar">
-        <div class="nav-item active" onclick="nav('p-market', this)">🛒</div>
-        <div class="nav-item" onclick="nav('p-rank', this)">🏆</div>
-        <div class="nav-item" onclick="nav('p-create', this)">➕</div>
-        <div class="nav-item" onclick="nav('p-profile', this)">👤</div>
+    <nav class="bottom-nav">
+        <div class="nav-link active" onclick="nav('view-market', this)">🛒</div>
+        <div class="nav-link" onclick="nav('view-rank', this)">🏆</div>
+        <div class="nav-link" onclick="nav('view-create', this)">➕</div>
+        <div class="nav-link" onclick="nav('view-profile', this)">👤</div>
     </nav>
 
-    <canvas id="proc-canvas" style="display:none"></canvas>
+    <canvas id="c-tool" style="display:none"></canvas>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
 
-        // КОНФИГУРАЦИЯ ОБЛАКА (JSONBin)
-        const DB_URL = "https://api.jsonbin.io/v3/b/65fd5a7a1f5677401f4142e8";
-        const API_KEY = "$2a$10$7XyH/zH2I2.M2.M1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1";
+        // CLOUD STORAGE CONFIG
+        const DB = "https://api.jsonbin.io/v3/b/65fd5a7a1f5677401f4142e8";
+        const KEY = "$2a$10$7XyH/zH2I2.M2.M1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1.m1";
 
-        // ЛОКАЛЬНАЯ БАЗА
-        let state = JSON.parse(localStorage.getItem('NFTZET_ULTRA_V7')) || {
-            user: { name: tg.initDataUnsafe?.user?.first_name || "Коллекционер", lvl: 1, xp: 0 },
-            wallet: { ton: 0, nf: 250, stars: 0 },
+        // LOCAL APP STATE
+        let app = JSON.parse(localStorage.getItem('NFTZET_GOD_V8')) || {
+            user: { name: tg.initDataUnsafe?.user?.first_name || "DuckyDev", lvl: 1, xp: 20 },
+            wallet: { ton: 0, nf: 500, stars: 0 },
             inventory: []
         };
 
-        let cloudData = { items: [], users: [] };
-        let activeImage = "";
+        let cloud = { items: [], users: [] };
+        let activeImg = "";
 
-        // 1. СИНХРОНИЗАЦИЯ
-        async function syncAll() {
+        // 1. SYNC ENGINE
+        async function sync() {
             try {
-                const r = await fetch(`${DB_URL}/latest?t=${Date.now()}`, { headers: { "X-Master-Key": API_KEY } });
+                const r = await fetch(`${DB}/latest?v=${Date.now()}`, { headers: {"X-Master-Key": KEY}});
                 const d = await r.json();
-                cloudData = d.record || { items: [], users: [] };
-                renderAll();
-            } catch(e) { console.error("Cloud Error"); }
+                cloud = d.record || { items: [], users: [] };
+                renderMarket();
+                renderRank();
+            } catch(e) { console.error("Sync Failed"); }
         }
 
-        async function pushCloud() {
-            await fetch(DB_URL, {
+        async function push() {
+            await fetch(DB, {
                 method: 'PUT',
-                headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
-                body: JSON.stringify(cloudData)
+                headers: {"Content-Type":"application/json", "X-Master-Key": KEY},
+                body: JSON.stringify(cloud)
             });
         }
 
-        // 2. РЕНДЕРИНГ
-        function renderAll() {
-            // Лента Маркета
-            const list = document.getElementById('cloud-list');
-            list.innerHTML = cloudData.items.map(item => `
-                <div class="nft-item ${item.rarity}-glow" onclick="previewItem(${item.id})">
-                    <div class="nft-image-wrapper">
-                        <div class="rarity-tag" style="background:var(--${item.rarity})">${item.rarity}</div>
-                        <img src="${item.img}" class="nft-img">
+        // 2. RENDERERS
+        function renderMarket() {
+            const list = document.getElementById('market-list');
+            list.innerHTML = cloud.items.map(i => `
+                <div class="nft-box glow-${i.rarity}" onclick="buyNFT(${i.id})">
+                    <div class="nft-preview">
+                        <div class="rarity-label" style="background:var(--r-${i.rarity})">${i.rarity}</div>
+                        <img src="${i.img}" class="nft-img">
                     </div>
-                    <div class="item-info">
-                        <h4 class="item-name">${item.name}</h4>
-                        <span class="item-author">@${item.author}</span>
-                        <div class="price-row">
-                            <span class="price-val">${item.price === 0 ? 'FREE' : item.price + ' TON'}</span>
-                            <span style="font-size:10px; color:var(--text-muted)">#${item.id.toString().slice(-4)}</span>
+                    <div class="nft-details">
+                        <h4 class="nft-title">${i.name}</h4>
+                        <span class="nft-author">@${i.author}</span>
+                        <div class="nft-footer">
+                            <span class="nft-price">${i.price === 0 ? 'FREE' : i.price + ' ' + i.cur}</span>
+                            <span style="font-size:10px; color:var(--text-muted)">#${i.id.toString().slice(-4)}</span>
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
 
-            // Рейтинг
-            const leaders = document.getElementById('leaderboard');
-            const sorted = [...cloudData.users].sort((a,b) => b.lvl - a.lvl).slice(0, 10);
-            leaders.innerHTML = sorted.map((u, i) => `
-                <div class="leader-item">
-                    <b style="width:30px; color:var(--text-muted)">${i+1}</b>
-                    <div style="width:35px; height:35px; border-radius:50%; background:var(--gradient)"></div>
+        function renderRank() {
+            const list = document.getElementById('rank-list');
+            const top = [...cloud.users].sort((a,b) => b.lvl - a.lvl).slice(0, 15);
+            list.innerHTML = top.map((u, i) => `
+                <div style="display:flex; align-items:center; gap:15px; padding:15px 20px; border-bottom:1px solid rgba(255,255,255,0.03)">
+                    <b style="width:25px; color:var(--text-muted)">${i+1}</b>
+                    <div style="width:38px; height:38px; border-radius:50%; background:var(--gradient)"></div>
                     <div style="flex:1"><b>${u.name}</b></div>
-                    <div style="color:var(--warning); font-weight:bold">LVL ${u.lvl}</div>
+                    <div style="color:var(--warning)">LVL ${u.lvl}</div>
                 </div>
             `).join('');
         }
 
-        // 3. ФУНКЦИИ NFT
-        function processFile(input) {
-            const file = input.files[0];
-            const reader = new FileReader();
-            reader.onload = (e) => {
+        // 3. LOGIC
+        function handleFile(input) {
+            const f = input.files[0];
+            const rd = new FileReader();
+            rd.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    const canvas = document.getElementById('proc-canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 600; canvas.height = 600;
+                    const c = document.getElementById('c-tool');
+                    const ctx = c.getContext('2d');
+                    c.width = 600; c.height = 600;
                     ctx.drawImage(img, 0, 0, 600, 600);
-                    activeImage = canvas.toDataURL("image/jpeg", 0.7);
-                    document.getElementById('drop-text').innerHTML = `<img src="${activeImage}" style="width:100%; height:100%; object-fit:cover; border-radius:23px">`;
+                    activeImg = c.toDataURL("image/jpeg", 0.7);
+                    document.getElementById('upload-preview').innerHTML = `<img src="${activeImg}" style="width:100%; height:100%; object-fit:cover; border-radius:28px">`;
                 };
                 img.src = e.target.result;
             };
-            reader.readAsDataURL(file);
+            rd.readAsDataURL(f);
         }
 
-        async function publish(isFree) {
-            const title = document.getElementById('in-title').value;
-            const price = isFree ? 0 : parseFloat(document.getElementById('in-cost').value);
-            const rarity = document.getElementById('in-rarity').value;
-            const desc = document.getElementById('in-about').value;
+        async function publishNFT(isFree) {
+            const n = document.getElementById('in-name').value;
+            const p = isFree ? 0 : parseFloat(document.getElementById('in-price').value);
+            const r = document.getElementById('in-rare').value;
+            const c = document.getElementById('in-cur').value;
 
-            if(!title || !activeImage || (!isFree && isNaN(price))) return tg.showAlert("Ошибка: Заполните все поля!");
+            if(!n || !activeImg) return tg.showAlert("Please fill name and upload image!");
 
-            tg.showConfirm("Выставить NFT в общее Облако?", async (ok) => {
+            tg.showConfirm(`Confirm minting ${n}?`, async (ok) => {
                 if(ok) {
-                    const newItem = {
-                        id: Date.now(), name: title, desc, price, rarity,
-                        img: activeImage, author: state.user.name
-                    };
-                    cloudData.items.unshift(newItem);
-                    
-                    // Обновляем статус юзера в облаке
-                    updateUserInCloud();
-                    
-                    await pushCloud();
-                    tg.showAlert("✅ NFT опубликован!");
+                    const item = { id: Date.now(), name: n, price: p, rarity: r, cur: c, img: activeImg, author: app.user.name };
+                    cloud.items.unshift(item);
+                    updateCloudUser();
+                    await push();
+                    tg.showAlert("Successfully Minted!");
                     location.reload();
                 }
             });
         }
 
-        function previewItem(id) {
-            const item = cloudData.items.find(x => x.id === id);
-            tg.showConfirm(`Вы хотите купить "${item.name}" за ${item.price} TON?`, (ok) => {
+        function buyNFT(id) {
+            const item = cloud.items.find(x => x.id === id);
+            tg.showConfirm(`Buy ${item.name} for ${item.price} ${item.cur}?`, (ok) => {
                 if(ok) {
-                    if(state.wallet.ton >= item.price || item.price === 0) {
-                        state.wallet.ton -= item.price;
-                        state.inventory.unshift(item);
-                        addXP(20);
+                    const curKey = item.cur.toLowerCase();
+                    if(item.price === 0 || app.wallet[curKey] >= item.price) {
+                        app.wallet[curKey] -= item.price;
+                        app.inventory.unshift(item);
+                        addXP(25);
+                        tg.HapticFeedback.notificationOccurred('success');
+                        tg.showAlert("Added to your collection!");
                         save();
-                        tg.showAlert("🎉 Поздравляем! Предмет в вашей коллекции.");
                     } else {
-                        tg.showAlert("❌ Недостаточно TON!");
+                        tg.showAlert("Insufficient balance!");
                     }
                 }
             });
         }
 
-        // 4. СЛУЖЕБНОЕ
-        function nav(pageId, el) {
+        // 4. UTILS
+        function nav(id, el) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
             el.classList.add('active');
-            if(pageId === 'p-profile') renderInv();
-            syncAll();
+            if(id === 'view-profile') renderInv();
+            sync();
         }
 
-        function addXP(val) {
-            state.user.xp += val;
-            if(state.user.xp >= 100) {
-                state.user.lvl++;
-                state.user.xp = 0;
-                tg.showAlert("🆕 УРОВЕНЬ ПОВЫШЕН!");
-            }
+        function addXP(v) {
+            app.user.xp += v;
+            if(app.user.xp >= 100) { app.user.lvl++; app.user.xp = 0; }
             save();
-            updateUserInCloud();
+            updateCloudUser();
         }
 
-        function updateUserInCloud() {
-            const idx = cloudData.users.findIndex(u => u.name === state.user.name);
-            if(idx > -1) cloudData.users[idx].lvl = state.user.lvl;
-            else cloudData.users.push({ name: state.user.name, lvl: state.user.lvl });
+        function updateCloudUser() {
+            const idx = cloud.users.findIndex(u => u.name === app.user.name);
+            if(idx > -1) cloud.users[idx].lvl = app.user.lvl;
+            else cloud.users.push({name: app.user.name, lvl: app.user.lvl});
         }
 
         function save() {
-            localStorage.setItem('NFTZET_ULTRA_V7', JSON.stringify(state));
+            localStorage.setItem('NFTZET_GOD_V8', JSON.stringify(app));
             updateUI();
         }
 
         function updateUI() {
-            document.getElementById('h-username').innerText = state.user.name;
-            document.getElementById('u-name').innerText = state.user.name;
-            document.getElementById('h-level').innerText = state.user.lvl;
-            document.getElementById('h-xp-bar').style.width = state.user.xp + "%";
-            document.getElementById('w-ton').innerText = state.wallet.ton.toFixed(2);
-            document.getElementById('w-nf').innerText = state.wallet.nf;
-            document.getElementById('w-stars').innerText = state.wallet.stars;
-            document.getElementById('u-count').innerText = state.inventory.length;
+            document.getElementById('h-name').innerText = app.user.name;
+            document.getElementById('u-name').innerText = app.user.name;
+            document.getElementById('h-lvl').innerText = app.user.lvl;
+            document.getElementById('h-xp').style.width = app.user.xp + "%";
+            document.getElementById('w-ton').innerText = app.wallet.ton.toFixed(2);
+            document.getElementById('w-nf').innerText = app.wallet.nf;
+            document.getElementById('h-stars').innerText = app.wallet.stars;
+            document.getElementById('u-count').innerText = app.inventory.length;
         }
 
         function renderInv() {
-            const inv = document.getElementById('u-inventory');
-            inv.innerHTML = state.inventory.map(i => `
-                <div class="nft-item">
-                    <img src="${i.img}" class="nft-img" style="height:140px">
-                    <div class="item-info"><b>${i.name}</b></div>
-                </div>
-            `).join('');
+            const grid = document.getElementById('my-list');
+            grid.innerHTML = app.inventory.map(i => `<div class="nft-box"><img src="${i.img}" class="nft-img"><div style="padding:10px"><b>${i.name}</b></div></div>`).join('');
         }
 
-        function addMoney(type) {
-            state.wallet[type] += 50;
+        function earn(type) {
+            app.wallet[type] += 50;
             save();
-            tg.HapticFeedback.notificationOccurred('success');
+            tg.HapticFeedback.impactOccurred('medium');
         }
 
         function editName() {
-            const n = prompt("Ваше новое имя:", state.user.name);
-            if(n) { state.user.name = n; save(); updateUserInCloud(); pushCloud(); }
+            const n = prompt("New Nickname:", app.user.name);
+            if(n) { app.user.name = n; save(); updateCloudUser(); push(); }
         }
 
-        // СТАРТ
+        // START
         updateUI();
-        syncAll();
+        sync();
     </script>
 </body>
 </html>

@@ -1,173 +1,350 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мини-приложение NFT</title>
-  <style>
-    /* Основные стили */
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f5f5f5;
-      color: #333;
-    }
-    header {
-      background-color: #4CAF50;
-      color: #fff;
-      padding: 1rem;
-      text-align: center;
-    }
-    nav {
-      display: flex;
-      justify-content: space-around;
-      background-color: #f1f1f1;
-      padding: 10px;
-      border-bottom: 2px solid #ddd;
-    }
-    nav a {
-      text-decoration: none;
-      color: #333;
-    }
-    nav a:hover {
-      color: #4CAF50;
-    }
-    .container {
-      padding: 20px;
-    }
-    .settings, .profile, .market, .create-nft, .communities {
-      display: none;
-    }
-    /* Кнопки */
-    button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      border-radius: 5px;
-      margin: 5px 0;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .hidden { display: none; }
-    /* Темы */
-    .dark-theme {
-      background-color: #333;
-      color: white;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NFTzet Ecosystem</title>
+    <style>
+        :root {
+            --bg: #05070a;
+            --surface: rgba(255, 255, 255, 0.05);
+            --accent: #00d2ff;
+            --accent-2: #9d50bb;
+            --text: #ffffff;
+            --text-dim: #94a3b8;
+            --gold: #fbbf24;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, var(--bg) 70%);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Навигация снизу (Tab Bar) */
+        nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 25px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000;
+        }
+
+        nav button {
+            background: none;
+            border: none;
+            color: var(--text-dim);
+            font-size: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+        }
+
+        nav button i { font-size: 20px; }
+        nav button.active { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+
+        /* Контент */
+        .app-container {
+            flex: 1;
+            padding: 20px;
+            padding-bottom: 100px;
+            overflow-y: auto;
+        }
+
+        .tab-section { display: none; animation: fadeIn 0.4s ease; }
+        .tab-section.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Карточки */
+        .glass-card {
+            background: var(--surface);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Профиль */
+        .profile-header { text-align: center; }
+        .avatar-box {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent), var(--accent-2));
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.3);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        /* Кнопки */
+        .btn-main {
+            width: 100%;
+            padding: 14px;
+            border-radius: 16px;
+            border: none;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            color: white;
+        }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        /* Создание NFT */
+        .upload-zone {
+            border: 2px dashed rgba(255,255,255,0.2);
+            border-radius: 20px;
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .watermark {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 14px;
+            font-weight: 900;
+            color: white;
+            opacity: 0.6;
+            text-shadow: 1px 1px 2px black;
+            font-style: italic;
+        }
+
+        .shiny-effect {
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: skewX(-25deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine { 100% { left: 200%; } }
+
+        /* Поля ввода */
+        input, select, textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 12px;
+            color: white;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .badge-limited {
+            background: #ef4444;
+            color: white;
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            position: absolute;
+            top: 10px; left: 10px;
+            font-weight: bold;
+        }
+
+        h2 { font-size: 22px; margin-top: 0; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
 </head>
-<body>
-  <header>
-    <h1>Приложение NFT</h1>
-  </header>
-  <nav>
-    <a href="#" onclick="showSection('settings')">Настройки</a>
-    <a href="#" onclick="showSection('profile')">Профиль</a>
-    <a href="#" onclick="showSection('market')">Маркет</a>
-    <a href="#" onclick="showSection('create-nft')">Создать NFT</a>
-    <a href="#" onclick="showSection('communities')">Сообщества</a>
-  </nav>
+<body id="main-app">
 
-  <div class="container">
-    <!-- Секция настроек -->
-    <section id="settings" class="settings">
-      <h2>Настройки</h2>
-      <label>
-        <input type="checkbox" id="incognitoMode" onclick="toggleIncognito()"> Режим инкогнито
-      </label><br>
-      <label>
-        Язык:
-        <select id="language" onchange="changeLanguage()">
-          <option>Русский</option>
-          <option>English</option>
-          <option>中文</option>
-          <option>日本語</option>
-          <option>ქართული</option>
-          <option>Հայերեն</option>
-        </select>
-      </label><br>
-      <label>
-        <input type="checkbox" id="privacyMode" onclick="togglePrivacy()"> Режим приватности
-      </label><br>
-      <button onclick="reloadApp()">Перезагрузка приложения</button>
+<div class="app-container">
+    
+    <section id="profile" class="tab-section active">
+        <div class="glass-card profile-header">
+            <div class="avatar-box" id="avatar">👤</div>
+            <h2 id="nickname">Gamer_Zet</h2>
+            <p id="bio" style="color: var(--text-dim); font-size: 14px;">NFT Collector & Creator</p>
+            <div style="display: flex; justify-content: space-around; margin: 20px 0;">
+                <div><b>1.2k</b><br><small>Followers</small></div>
+                <div><b>48</b><br><small>NFTs</small></div>
+                <div><b>850</b><br><small>Likes</small></div>
+            </div>
+            <button class="btn-outline" onclick="toggleIncognito()">🎩 Режим Инкогнито</button>
+            <button class="btn-outline">🖼 Поставить NFT на ник</button>
+        </div>
     </section>
 
-    <!-- Секция профиля -->
-    <section id="profile" class="profile">
-      <h2>Профиль</h2>
-      <p>Изменить аватарку, ник, и поставить NFT на ник...</p>
-      <label>Изменить аватарку: <input type="file"></label><br>
-      <button>Сохранить</button>
+    <section id="market" class="tab-section">
+        <h2>Маркетплейс</h2>
+        <div class="glass-card">
+            <div class="upload-zone" style="background: url('https://via.placeholder.com/400x200/1e293b/fff?text=Cyber+Punk+Art') center/cover;">
+                <div class="badge-limited">LIMITED</div>
+                <div class="shiny-effect"></div>
+                <div class="watermark">NFTzet</div>
+            </div>
+            <h3 style="margin: 15px 0 5px;">Neon Samurai #01</h3>
+            <p style="font-size: 12px; color: var(--text-dim);">Создатель: ArtMaster</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                <span style="color: var(--accent); font-weight: bold; font-size: 18px;">15.5 TON</span>
+                <button class="btn-main" style="width: auto; padding: 10px 25px; margin: 0;">Купить</button>
+            </div>
+        </div>
     </section>
 
-    <!-- Секция маркета -->
-    <section id="market" class="market">
-      <h2>Маркет NFT</h2>
-      <p>Тут можно смотреть на NFT, ставить лайки, писать отзывы...</p>
+    <section id="create" class="tab-section">
+        <h2>Создание NFT</h2>
+        <div class="glass-card">
+            <div class="upload-zone" id="preview-box">
+                <span>Загрузите JPEG, PNG или MP4</span>
+                <input type="file" id="fileInput" style="opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer;">
+                <div class="watermark">NFTzet</div>
+            </div>
+            <input type="text" placeholder="Название NFT">
+            <textarea placeholder="Описание предмета..."></textarea>
+            <div style="display: flex; gap: 10px;">
+                <input type="number" placeholder="Стоимость">
+                <select>
+                    <option>TON</option>
+                    <option>NFcoin</option>
+                    <option>ClaudeCoin</option>
+                </select>
+            </div>
+            <label style="font-size: 12px; color: var(--text-dim); display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" style="width: auto;"> Сделать Элитным (1000 TON)
+            </label>
+            <button class="btn-main">Опубликовать</button>
+            <button class="btn-outline" style="border-color: var(--accent); color: var(--accent);">Опубликовать бесплатно</button>
+        </div>
     </section>
 
-    <!-- Секция создания NFT -->
-    <section id="create-nft" class="create-nft">
-      <h2>Создание NFT</h2>
-      <p>Загрузить изображение или видео:</p>
-      <input type="file" id="nftFile" accept=".jpeg,.png,.mp4"><br>
-      <input type="text" placeholder="Название NFT"><br>
-      <textarea placeholder="Описание NFT"></textarea><br>
-      <label>Стоимость NFT:
-        <input type="number" placeholder="Стоимость"> 
-        <select>
-          <option>TON</option>
-          <option>NFcoin</option>
-          <option>ClaudeCoin</option>
-        </select>
-      </label><br>
-      <button>Опубликовать</button>
+    <section id="communities" class="tab-section">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Сообщества</h2>
+            <button class="btn-main" style="width: auto; font-size: 12px; padding: 8px 15px;">+ Создать</button>
+        </div>
+        <div class="glass-card">
+            <h3>TON Builders 💎</h3>
+            <p style="font-size: 13px; color: var(--text-dim);">Сообщество разработчиков на блокчейне.</p>
+            <button class="btn-outline">Вход: 5 TON</button>
+        </div>
     </section>
 
-    <!-- Секция сообществ -->
-    <section id="communities" class="communities">
-      <h2>Сообщества</h2>
-      <p>Тут можно создать новое сообщество...</p>
-      <button>Создать сообщество</button>
+    <section id="settings" class="tab-section">
+        <h2>Настройки</h2>
+        <div class="glass-card">
+            <label>Язык приложения</label>
+            <select id="lang">
+                <option>Русский</option>
+                <option>English</option>
+                <option>Chinese</option>
+                <option>Georgian</option>
+                <option>Armenian</option>
+            </select>
+            
+            <label style="margin-top: 15px; display: block;">Тема оформления</label>
+            <button class="btn-outline" onclick="toggleTheme()">🌓 Сменить Тему (Темная/Светлая)</button>
+            
+            <label style="margin-top: 15px; display: block;">Приватность</label>
+            <button class="btn-outline">🔒 Настроить видимость</button>
+            
+            <button class="btn-main" style="background: #ef4444;" onclick="location.reload()">🔄 Перезагрузить приложение</button>
+            <button class="btn-outline" style="margin-top: 20px;">🎧 Служба поддержки</button>
+        </div>
     </section>
-  </div>
 
-  <script>
-    // Показать выбранную секцию
-    function showSection(sectionId) {
-      document.querySelectorAll('.container > section').forEach(section => {
-        section.style.display = 'none';
-      });
-      document.getElementById(sectionId).style.display = 'block';
+</div>
+
+<nav>
+    <button class="active" onclick="switchTab('profile', this)"><i>👤</i>Профиль</button>
+    <button onclick="switchTab('market', this)"><i>🛒</i>Маркет</button>
+    <button onclick="switchTab('create', this)"><i>✨</i>Создать</button>
+    <button onclick="switchTab('communities', this)"><i>👥</i>Группы</button>
+    <button onclick="switchTab('settings', this)"><i>⚙️</i>Опции</button>
+</nav>
+
+<script>
+    let incognito = false;
+
+    function switchTab(id, btn) {
+        document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        btn.classList.add('active');
     }
 
-    // Инкогнито режим
     function toggleIncognito() {
-      const isIncognito = document.getElementById('incognitoMode').checked;
-      alert(isIncognito ? 'Режим инкогнито активирован' : 'Режим инкогнито выключен');
+        incognito = !incognito;
+        const nick = document.getElementById('nickname');
+        const ava = document.getElementById('avatar');
+        
+        if(incognito) {
+            nick.innerText = "Secret";
+            ava.innerText = "🎩";
+            ava.style.background = "#1e293b";
+        } else {
+            nick.innerText = "Gamer_Zet";
+            ava.innerText = "👤";
+            ava.style.background = "linear-gradient(45deg, var(--accent), var(--accent-2))";
+        }
+        localStorage.setItem('incognitoMode', incognito);
     }
 
-    // Приватность
-    function togglePrivacy() {
-      const isPrivate = document.getElementById('privacyMode').checked;
-      alert(isPrivate ? 'Приватный режим активирован' : 'Приватный режим выключен');
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+        // Логика сохранения темы
     }
 
-    // Перезагрузка приложения
-    function reloadApp() {
-      alert('Приложение перезагружается...');
-      location.reload();
-    }
+    // Сохранение данных
+    window.onload = () => {
+        const saved = localStorage.getItem('incognitoMode');
+        if(saved === 'true') toggleIncognito();
+    };
 
-    // Смена языка
-    function changeLanguage() {
-      const language = document.getElementById('language').value;
-      alert(`Выбран язык: ${language}`);
-    }
-  </script>
+    // Проверка видео (5 сек)
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file && file.type.includes('video')) {
+            const video = document.createElement('video');
+            video.preload = 'metadata';
+            video.onloadedmetadata = function() {
+                window.URL.revokeObjectURL(video.src);
+                if (video.duration > 5) {
+                    alert("Видео будет обрезано до 5 секунд!");
+                }
+            }
+            video.src = URL.createObjectURL(file);
+        }
+    });
+</script>
+
 </body>
 </html>

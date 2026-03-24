@@ -9,7 +9,7 @@ from aiogram.types import Message, InlineKeyboardButton, WebAppInfo
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 # ДАННЫЕ
-TOKEN = "8641940120:AAGOtkjQLfMVeVflplgamEPV2KCofMjdIsY"
+TOKEN = "DID YOU REALLY HOPE TO STEAL THE TOKEN? FUCK YOU!"
 MINI_APP_URL = "https://evelinafanatka72-del.github.io/NFT-miniappBOT1/"
 
 dp = Dispatcher()

@@ -3,206 +3,224 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NFTzet Mini App</title>
+<title>NFTzet</title>
 
 <style>
 :root {
-    --bg: #121212;
-    --text: #ffffff;
-    --card: #1e1e1e;
+    --bg:#0f0f0f;
+    --card:#1c1c1c;
+    --accent:#6c5cff;
+    --text:#fff;
 }
 
 .light {
-    --bg: #ffffff;
-    --text: #000000;
-    --card: #f2f2f2;
+    --bg:#ffffff;
+    --card:#f2f2f2;
+    --text:#000;
 }
 
 body {
-    margin: 0;
-    font-family: Arial;
-    background: var(--bg);
-    color: var(--text);
+    margin:0;
+    font-family: system-ui;
+    background:var(--bg);
+    color:var(--text);
+}
+
+header {
+    padding:15px;
+    text-align:center;
+    font-weight:bold;
+    font-size:20px;
 }
 
 nav {
-    display: flex;
-    justify-content: space-around;
-    background: var(--card);
-    padding: 10px;
+    position:fixed;
+    bottom:0;
+    width:100%;
+    display:flex;
+    justify-content:space-around;
+    background:var(--card);
+    padding:10px 0;
 }
 
 nav button {
-    background: none;
-    border: none;
-    color: var(--text);
-    font-size: 14px;
-    cursor: pointer;
+    background:none;
+    border:none;
+    color:var(--text);
+    font-size:12px;
 }
 
 .page {
-    display: none;
-    padding: 15px;
+    display:none;
+    padding:15px;
+    padding-bottom:80px;
 }
 
 .active {
-    display: block;
+    display:block;
 }
 
 .card {
-    background: var(--card);
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 10px;
+    background:var(--card);
+    padding:12px;
+    border-radius:12px;
+    margin:10px 0;
+}
+
+input, textarea {
+    width:100%;
+    padding:10px;
+    margin:5px 0;
+    border:none;
+    border-radius:8px;
+    background:#2a2a2a;
+    color:white;
+}
+
+button.main {
+    background:var(--accent);
+    border:none;
+    padding:10px;
+    border-radius:10px;
+    color:white;
+    width:100%;
+    margin-top:10px;
+    font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<nav>
-<button onclick="openPage('profile')">Профиль</button>
-<button onclick="openPage('market')">Маркет</button>
-<button onclick="openPage('community')">Сообщества</button>
-<button onclick="openPage('create')">Создать</button>
-<button onclick="openPage('settings')">Настройки</button>
-</nav>
+<header>🚀 NFTzet</header>
 
 <!-- ПРОФИЛЬ -->
 <div id="profile" class="page active">
-<h2>Профиль</h2>
-<input id="nickname" placeholder="Ник">
-<button onclick="saveProfile()">Сохранить</button>
+<h2>👤 Профиль</h2>
+<input id="nick" placeholder="Ник">
+<button class="main" onclick="saveProfile()">💾 Сохранить</button>
 <p id="showNick"></p>
 </div>
 
 <!-- МАРКЕТ -->
 <div id="market" class="page">
-<h2>Маркет NFT</h2>
-<div id="nftList"></div>
+<h2>🛒 Маркет NFT</h2>
+<div id="nfts"></div>
 </div>
 
 <!-- СООБЩЕСТВА -->
 <div id="community" class="page">
-<h2>Сообщества</h2>
-<input id="communityName" placeholder="Название">
-<button onclick="createCommunity()">Создать</button>
-<div id="communityList"></div>
+<h2>🌐 Сообщества</h2>
+<input id="commName" placeholder="Название">
+<button class="main" onclick="addCommunity()">➕ Создать</button>
+<div id="comms"></div>
 </div>
 
-<!-- СОЗДАТЬ NFT -->
+<!-- СОЗДАТЬ -->
 <div id="create" class="page">
-<h2>Создать NFT</h2>
-<input id="nftName" placeholder="Название"><br><br>
-<textarea id="nftDesc" placeholder="Описание"></textarea><br><br>
-<input type="number" id="nftPrice" placeholder="Цена"><br><br>
+<h2>✨ Создать NFT</h2>
+<input id="nName" placeholder="Название">
+<textarea id="nDesc" placeholder="Описание"></textarea>
+<input id="nPrice" type="number" placeholder="Цена">
 
-<button onclick="createNFT()">Опубликовать</button>
-<button onclick="createNFT(true)">Опубликовать бесплатно</button>
+<button class="main" onclick="createNFT()">🚀 Опубликовать</button>
+<button class="main" onclick="createNFT(true)">🎁 Бесплатно</button>
 </div>
 
 <!-- НАСТРОЙКИ -->
 <div id="settings" class="page">
-<h2>Настройки</h2>
+<h2>⚙️ Настройки</h2>
 
-<label>
-<input type="checkbox" id="incognito" onchange="toggleIncognito()">
-Инкогнито
+<label>🕵️ Инкогнито
+<input type="checkbox" onchange="toggleIncognito()">
 </label><br><br>
 
-<label>
+<label>🌗 Тема
 <input type="checkbox" onchange="toggleTheme()">
-Светлая тема
 </label><br><br>
 
-<button onclick="reloadApp()">Перезагрузка</button>
-
+<button class="main" onclick="reload()">🔄 Перезагрузка</button>
 </div>
 
+<!-- НАВИГАЦИЯ -->
+<nav>
+<button onclick="openPage('profile')">👤</button>
+<button onclick="openPage('market')">🛒</button>
+<button onclick="openPage('community')">🌐</button>
+<button onclick="openPage('create')">✨</button>
+<button onclick="openPage('settings')">⚙️</button>
+</nav>
+
 <script>
-let data = JSON.parse(localStorage.getItem("app")) || {
-    profile: {nick: "User"},
-    nft: [],
-    communities: [],
-    incognito: false
+let app = JSON.parse(localStorage.getItem("app")) || {
+    nick:"User",
+    nft:[],
+    comm:[],
+    incognito:false
 };
 
-function save() {
-    localStorage.setItem("app", JSON.stringify(data));
+function save(){localStorage.setItem("app",JSON.stringify(app));}
+
+function openPage(p){
+    document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+    document.getElementById(p).classList.add("active");
 }
 
-function openPage(id) {
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-}
-
-function saveProfile() {
-    data.profile.nick = document.getElementById("nickname").value;
+function saveProfile(){
+    app.nick=document.getElementById("nick").value;
     save();
-    renderProfile();
+    render();
 }
 
-function renderProfile() {
-    let nick = data.incognito ? "Secret" : data.profile.nick;
-    document.getElementById("showNick").innerText = "Ник: " + nick;
+function render(){
+    document.getElementById("showNick").innerText =
+        "Ник: " + (app.incognito ? "Secret 🕵️" : app.nick);
+
+    let nfts="";
+    app.nft.forEach(n=>{
+        nfts+=`<div class="card">✨ <b>${n.name}</b><br>${n.desc}<br>💰 ${n.price}</div>`;
+    });
+    document.getElementById("nfts").innerHTML=nfts;
+
+    let comms="";
+    app.comm.forEach(c=>{
+        comms+=`<div class="card">🌐 ${c}</div>`;
+    });
+    document.getElementById("comms").innerHTML=comms;
 }
 
-function createNFT(free=false) {
-    let nft = {
-        name: document.getElementById("nftName").value,
-        desc: document.getElementById("nftDesc").value,
-        price: free ? 0 : document.getElementById("nftPrice").value
+function createNFT(free=false){
+    let n={
+        name:nName.value,
+        desc:nDesc.value,
+        price:free?0:nPrice.value
     };
-    data.nft.push(nft);
+    app.nft.push(n);
     save();
-    renderNFT();
+    render();
 }
 
-function renderNFT() {
-    let list = document.getElementById("nftList");
-    list.innerHTML = "";
-    data.nft.forEach(n => {
-        list.innerHTML += `
-        <div class="card">
-        <b>${n.name}</b><br>
-        ${n.desc}<br>
-        Цена: ${n.price}
-        </div>`;
-    });
-}
-
-function createCommunity() {
-    let name = document.getElementById("communityName").value;
-    data.communities.push(name);
+function addCommunity(){
+    app.comm.push(commName.value);
     save();
-    renderCommunities();
+    render();
 }
 
-function renderCommunities() {
-    let list = document.getElementById("communityList");
-    list.innerHTML = "";
-    data.communities.forEach(c => {
-        list.innerHTML += `<div class="card">${c}</div>`;
-    });
-}
-
-function toggleIncognito() {
-    data.incognito = !data.incognito;
+function toggleIncognito(){
+    app.incognito=!app.incognito;
     save();
-    renderProfile();
+    render();
 }
 
-function toggleTheme() {
+function toggleTheme(){
     document.body.classList.toggle("light");
 }
 
-function reloadApp() {
+function reload(){
     location.reload();
 }
 
-renderProfile();
-renderNFT();
-renderCommunities();
+render();
 </script>
 
 </body>

@@ -1,227 +1,123 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NFTzet</title>
-
-<style>
-:root {
-    --bg:#0f0f0f;
-    --card:#1c1c1c;
-    --accent:#6c5cff;
-    --text:#fff;
-}
-
-.light {
-    --bg:#ffffff;
-    --card:#f2f2f2;
-    --text:#000;
-}
-
-body {
-    margin:0;
-    font-family: system-ui;
-    background:var(--bg);
-    color:var(--text);
-}
-
-header {
-    padding:15px;
-    text-align:center;
-    font-weight:bold;
-    font-size:20px;
-}
-
-nav {
-    position:fixed;
-    bottom:0;
-    width:100%;
-    display:flex;
-    justify-content:space-around;
-    background:var(--card);
-    padding:10px 0;
-}
-
-nav button {
-    background:none;
-    border:none;
-    color:var(--text);
-    font-size:12px;
-}
-
-.page {
-    display:none;
-    padding:15px;
-    padding-bottom:80px;
-}
-
-.active {
-    display:block;
-}
-
-.card {
-    background:var(--card);
-    padding:12px;
-    border-radius:12px;
-    margin:10px 0;
-}
-
-input, textarea {
-    width:100%;
-    padding:10px;
-    margin:5px 0;
-    border:none;
-    border-radius:8px;
-    background:#2a2a2a;
-    color:white;
-}
-
-button.main {
-    background:var(--accent);
-    border:none;
-    padding:10px;
-    border-radius:10px;
-    color:white;
-    width:100%;
-    margin-top:10px;
-    font-weight:bold;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>NFTzet 🌐</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background: #111;
+      color: #fff;
+      padding: 15px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #222;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      padding: 12px 20px;
+      transition: background 0.3s;
+    }
+    nav a:hover {
+      background: #444;
+    }
+    section {
+      padding: 20px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    footer {
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
 </head>
-
 <body>
+  <header>
+    <h1>✨ NFTzet — твой мир NFT ✨</h1>
+  </header>
 
-<header>🚀 NFTzet</header>
+  <nav>
+    <a href="#profile">👤 Профиль</a>
+    <a href="#settings">⚙️ Настройки</a>
+    <a href="#communities">🌍 Сообщества</a>
+    <a href="#market">🛒 Маркет</a>
+    <a href="#create">🎨 Создать NFT</a>
+    <a href="#support">💬 Поддержка</a>
+  </nav>
 
-<!-- ПРОФИЛЬ -->
-<div id="profile" class="page active">
-<h2>👤 Профиль</h2>
-<input id="nick" placeholder="Ник">
-<button class="main" onclick="saveProfile()">💾 Сохранить</button>
-<p id="showNick"></p>
-</div>
+  <section id="profile">
+    <div class="card">
+      <h2>👤 Профиль</h2>
+      <p>Здесь можно изменить аватарку, ник, поставить NFT на ник, просматривать подписчиков и комментарии.</p>
+    </div>
+  </section>
 
-<!-- МАРКЕТ -->
-<div id="market" class="page">
-<h2>🛒 Маркет NFT</h2>
-<div id="nfts"></div>
-</div>
+  <section id="settings">
+    <div class="card">
+      <h2>⚙️ Настройки</h2>
+      <ul>
+        <li>🕶️ Режим инкогнито</li>
+        <li>🌐 Смена языка (RU/EN/中文/日本語/ქართული/Հայերեն)</li>
+        <li>🔒 Режим приватности</li>
+        <li>🎨 Смена темы (чёрная/белая)</li>
+        <li>🔄 Перезагрузка приложения</li>
+      </ul>
+    </div>
+  </section>
 
-<!-- СООБЩЕСТВА -->
-<div id="community" class="page">
-<h2>🌐 Сообщества</h2>
-<input id="commName" placeholder="Название">
-<button class="main" onclick="addCommunity()">➕ Создать</button>
-<div id="comms"></div>
-</div>
+  <section id="communities">
+    <div class="card">
+      <h2>🌍 Сообщества</h2>
+      <p>Создавай свои сообщества или вступай в чужие. Настройки: приватность, аватарка, платный вход (TON, NFcoin, ClaudeCoin), скрытые сообщества.</p>
+    </div>
+  </section>
 
-<!-- СОЗДАТЬ -->
-<div id="create" class="page">
-<h2>✨ Создать NFT</h2>
-<input id="nName" placeholder="Название">
-<textarea id="nDesc" placeholder="Описание"></textarea>
-<input id="nPrice" type="number" placeholder="Цена">
+  <section id="market">
+    <div class="card">
+      <h2>🛒 NFT Маркет</h2>
+      <p>Здесь можно покупать, лайкать, оставлять отзывы и подписываться на авторов NFT.</p>
+    </div>
+  </section>
 
-<button class="main" onclick="createNFT()">🚀 Опубликовать</button>
-<button class="main" onclick="createNFT(true)">🎁 Бесплатно</button>
-</div>
+  <section id="create">
+    <div class="card">
+      <h2>🎨 Создать NFT</h2>
+      <p>Загрузи фото/видео (JPEG, PNG, MP4 до 5 сек), добавь описание, цену (TON/NFcoin/ClaudeCoin), сделай NFT временным или элитным. Автоматический водяной знак NFTzet ✨.</p>
+      <button>📤 Опубликовать</button>
+      <button>🆓 Опубликовать бесплатно</button>
+    </div>
+  </section>
 
-<!-- НАСТРОЙКИ -->
-<div id="settings" class="page">
-<h2>⚙️ Настройки</h2>
+  <section id="support">
+    <div class="card">
+      <h2>💬 Поддержка</h2>
+      <textarea placeholder="Напишите сообщение..."></textarea><br>
+      <button>📨 Отправить</button>
+    </div>
+  </section>
 
-<label>🕵️ Инкогнито
-<input type="checkbox" onchange="toggleIncognito()">
-</label><br><br>
-
-<label>🌗 Тема
-<input type="checkbox" onchange="toggleTheme()">
-</label><br><br>
-
-<button class="main" onclick="reload()">🔄 Перезагрузка</button>
-</div>
-
-<!-- НАВИГАЦИЯ -->
-<nav>
-<button onclick="openPage('profile')">👤</button>
-<button onclick="openPage('market')">🛒</button>
-<button onclick="openPage('community')">🌐</button>
-<button onclick="openPage('create')">✨</button>
-<button onclick="openPage('settings')">⚙️</button>
-</nav>
-
-<script>
-let app = JSON.parse(localStorage.getItem("app")) || {
-    nick:"User",
-    nft:[],
-    comm:[],
-    incognito:false
-};
-
-function save(){localStorage.setItem("app",JSON.stringify(app));}
-
-function openPage(p){
-    document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-    document.getElementById(p).classList.add("active");
-}
-
-function saveProfile(){
-    app.nick=document.getElementById("nick").value;
-    save();
-    render();
-}
-
-function render(){
-    document.getElementById("showNick").innerText =
-        "Ник: " + (app.incognito ? "Secret 🕵️" : app.nick);
-
-    let nfts="";
-    app.nft.forEach(n=>{
-        nfts+=`<div class="card">✨ <b>${n.name}</b><br>${n.desc}<br>💰 ${n.price}</div>`;
-    });
-    document.getElementById("nfts").innerHTML=nfts;
-
-    let comms="";
-    app.comm.forEach(c=>{
-        comms+=`<div class="card">🌐 ${c}</div>`;
-    });
-    document.getElementById("comms").innerHTML=comms;
-}
-
-function createNFT(free=false){
-    let n={
-        name:nName.value,
-        desc:nDesc.value,
-        price:free?0:nPrice.value
-    };
-    app.nft.push(n);
-    save();
-    render();
-}
-
-function addCommunity(){
-    app.comm.push(commName.value);
-    save();
-    render();
-}
-
-function toggleIncognito(){
-    app.incognito=!app.incognito;
-    save();
-    render();
-}
-
-function toggleTheme(){
-    document.body.classList.toggle("light");
-}
-
-function reload(){
-    location.reload();
-}
-
-render();
-</script>
-
+  <footer>
+    <p>© 2026 NFTzet — Все права защищены</p>
+  </footer>
 </body>
 </html>

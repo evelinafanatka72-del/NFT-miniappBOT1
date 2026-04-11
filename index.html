@@ -1,500 +1,537 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NFTzet — Мини-приложение</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
-        
-        body {
-            font-family: 'Inter', system_ui, sans-serif;
-        }
-        .logo-font {
-            font-family: 'Space Grotesk', sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>NFTzet Simulator</title>
+  <style>
+    /* CSS Переменные для Темы */
+    :root {
+      --bg: #f2f2f7; --card-bg: #ffffff; --text: #000000; --text-muted: #8e8e93;
+      --primary: #007aff; --danger: #ff3b30; --elite: linear-gradient(135deg, #ffd700, #ff8c00);
+      --border: #c6c6c8; --nav-bg: rgba(255, 255, 255, 0.9);
+    }
+    [data-theme="dark"] {
+      --bg: #000000; --card-bg: #1c1c1e; --text: #ffffff; --text-muted: #98989d;
+      --primary: #0a84ff; --border: #38383a; --nav-bg: rgba(28, 28, 30, 0.9);
+    }
 
-        .nft-card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-        
-        .nft-card:hover {
-            transform: scale(1.08) rotate(2deg);
-            box-shadow: 0 0 60px -10px rgb(0 255 157 / 0.6);
-        }
+    body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0 0 80px 0; transition: background 0.3s; }
+    
+    /* Утилиты и Сетка */
+    .view { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    
+    h1 { font-size: 28px; margin-bottom: 20px; font-weight: 800; }
+    h2 { font-size: 20px; margin: 20px 0 10px; }
+    
+    .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+    .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    
+    /* Инпуты и Кнопки */
+    input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); box-sizing: border-box; margin-bottom: 10px; font-size: 15px; }
+    textarea { min-height: 80px; resize: vertical; }
+    
+    button { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--primary); color: white; font-size: 16px; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
+    button.outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+    button.danger { background: var(--danger); }
+    button.elite-btn { background: var(--elite); color: black; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4); }
+    button:active { filter: brightness(0.9); }
 
-        .nft-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(0,255,157,0.3), transparent);
-            opacity: 0;
-            animation: nftShimmer 4s linear infinite;
-            pointer-events: none;
-        }
+    /* Тумблер (Switch) */
+    .switch { position: relative; display: inline-block; width: 50px; height: 28px; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border); transition: .4s; border-radius: 34px; }
+    .slider:before { position: absolute; content: ""; height: 24px; width: 24px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    input:checked + .slider { background-color: var(--primary); }
+    input:checked + .slider:before { transform: translateX(22px); }
 
-        @keyframes nftShimmer {
-            0% { transform: translateX(-150%); }
-            100% { transform: translateX(300%); }
-        }
+    /* Навигация */
+    .nav { position: fixed; bottom: 0; width: 100%; background: var(--nav-bg); backdrop-filter: blur(10px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 10px 0; z-index: 1000; }
+    .nav-item { text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 500; cursor: pointer; }
+    .nav-item.active { color: var(--primary); }
+    .nav-item div:first-child { font-size: 22px; margin-bottom: 4px; }
 
-        .watermark {
-            font-family: 'Space Grotesk', sans-serif;
-            text-shadow: 0 0 20px #00ff9d, 0 0 40px #00ff9d, 0 0 60px #00ff9d;
-            color: rgba(0, 255, 157, 0.95);
-            transform: rotate(-14deg);
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: 6px;
-            opacity: 0.9;
-            pointer-events: none;
-            z-index: 10;
-        }
+    /* Баланс */
+    .wallet-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px; }
+    .wallet-pill { background: var(--bg); padding: 8px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; white-space: nowrap; border: 1px solid var(--border); }
 
-        .modal {
-            animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+    /* Сетка NFT */
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .nft-card { background: var(--card-bg); border-radius: 14px; overflow: hidden; border: 1px solid var(--border); position: relative; display: flex; flex-direction: column; }
+    .nft-img { height: 140px; background: #ddd; display: flex; justify-content: center; align-items: center; font-size: 40px; position: relative; background-size: cover; background-position: center; }
+    
+    /* Эффект Блеска (Shiny) */
+    .shiny::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0) 100%); transform: skewX(-25deg); animation: shine 3s infinite; }
+    @keyframes shine { 0% { left: -100%; } 20% { left: 200%; } 100% { left: 200%; } }
+    
+    /* Водяной знак и Бейджи */
+    .watermark::after { content: "NFTzet"; position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; backdrop-filter: blur(2px); }
+    .badge { position: absolute; top: 8px; left: 8px; padding: 4px 8px; border-radius: 8px; font-size: 10px; font-weight: bold; color: white; z-index: 2; }
+    .badge.elite { background: var(--elite); color: black; }
+    .badge.limited { background: var(--danger); left: auto; right: 8px; }
 
-        @keyframes modalPop {
-            0% { transform: scale(0.95) translateY(30px); opacity: 0; }
-            100% { transform: scale(1) translateY(0); opacity: 1; }
-        }
-    </style>
+    .nft-info { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .nft-title { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+    .nft-desc { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .nft-price { font-weight: 800; color: var(--primary); font-size: 13px; }
+
+    /* Профиль */
+    .profile-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+    .avatar { width: 80px; height: 80px; border-radius: 50%; background: var(--bg); display: flex; justify-content: center; align-items: center; font-size: 40px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .avatar-secret { background: #000 !important; }
+    .stats { display: flex; justify-content: space-around; margin-bottom: 20px; background: var(--bg); padding: 12px; border-radius: 12px; }
+    .stats div { text-align: center; font-size: 12px; color: var(--text-muted); }
+    .stats b { display: block; font-size: 18px; color: var(--text); }
+  </style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen pb-20 dark">
+<body>
 
-    <!-- HEADER -->
-    <div id="header" class="sticky top-0 z-50 bg-zinc-900 border-b border-zinc-800 px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center gap-x-3">
-            <div class="w-9 h-9 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🪐</div>
-            <h1 class="logo-font text-3xl tracking-tighter text-white">NFT<span class="text-emerald-400">zet</span></h1>
+  <div id="view-profile" class="view active">
+    <h1>Профиль</h1>
+    <div class="card">
+      <div class="profile-header">
+        <div class="avatar" id="prof-avatar">👤</div>
+        <div>
+          <h2 style="margin: 0;" id="prof-nick">User</h2>
+          <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;" id="prof-status">ID: #0001</div>
         </div>
+      </div>
+      <div class="stats">
+        <div><b id="prof-followers">0</b>Подписчики</div>
+        <div><b id="prof-following">0</b>Подписки</div>
+        <div><b id="prof-nft-count">0</b>NFTs</div>
+      </div>
+      <button onclick="changeNick()">Изменить ник</button>
+      <button class="outline" onclick="alert('Жалоба отправлена модераторам')">Пожаловаться на профиль</button>
+    </div>
+
+    <h2>Кошелек</h2>
+    <div class="wallet-bar" id="wallet-display">
+      </div>
+
+    <h2>Моя коллекция NFT</h2>
+    <div id="private-lock" style="display:none; text-align:center; padding: 20px; color: var(--text-muted);">
+      🔒 Профиль скрыт настройками приватности/инкогнито
+    </div>
+    <div class="grid" id="my-nft-list"></div>
+  </div>
+
+  <div id="view-market" class="view">
+    <h1>Маркетплейс</h1>
+    <div class="grid" id="market-list">
+      </div>
+  </div>
+
+  <div id="view-create" class="view">
+    <h1>Создать NFT</h1>
+    <div class="card">
+      <h2>Генерация ИИ (Текст в Изображение)</h2>
+      <textarea id="ai-prompt" placeholder="Опишите NFT для генерации (он будет блестеть!)..."></textarea>
+      <button class="elite-btn" onclick="generateAINFT()">✨ Сгенерировать AI</button>
+      
+      <div style="text-align:center; margin: 15px 0; color: var(--text-muted); font-size: 14px;">— ИЛИ МЕДИА —</div>
+      
+      <h2>Загрузка файла</h2>
+      <input type="file" id="media-file" accept="image/jpeg, image/png, video/mp4" onchange="handleFileUpload(this)">
+      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Видео > 5 сек будет обрезано системой.</div>
+      
+      <div id="preview-box" class="nft-img watermark" style="border-radius: 12px; display: none; margin-bottom: 15px;"></div>
+    </div>
+
+    <div class="card" id="nft-settings" style="display:none;">
+      <h2>Настройки публикации</h2>
+      <input type="text" id="nft-title" placeholder="Название NFT">
+      <textarea id="nft-desc" placeholder="Описание..."></textarea>
+      
+      <div class="row">
+        <input type="number" id="nft-price" placeholder="Цена" style="width: 60%; margin-bottom:0;">
+        <select id="nft-currency" style="width: 35%; margin-bottom:0;">
+          <option value="TON">TON</option>
+          <option value="NFcoin">NFcoin</option>
+          <option value="ClaudeCoin">ClaudeCoin</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <span>Временный (Limited, 1 год)</span>
+        <label class="switch"><input type="checkbox" id="nft-limited"><span class="slider"></span></label>
+      </div>
+      
+      <div class="row">
+        <div>
+          <span>Элитный статус</span>
+          <div style="font-size: 10px; color: var(--text-muted);">Цена: 1k TON / 10k NFcoin / 100k ClaudeCoin</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="nft-elite"><span class="slider"></span></label>
+      </div>
+
+      <button onclick="publishNFT(false)">Опубликовать (Платно)</button>
+      <button class="outline" onclick="publishNFT(true)">Опубликовать БЕСПЛАТНО</button>
+    </div>
+  </div>
+
+  <div id="view-communities" class="view">
+    <h1>Сообщества</h1>
+    <button class="elite-btn" onclick="document.getElementById('comm-form').style.display='block'">+ Создать сообщество</button>
+    
+    <div id="comm-form" class="card" style="display:none; border: 2px solid var(--primary);">
+      <h2>Настройки сообщества</h2>
+      <input type="text" id="comm-name" placeholder="Название сообщества">
+      <div class="row"><span>Приватное</span><label class="switch"><input type="checkbox" id="comm-private"><span class="slider"></span></label></div>
+      <div class="row"><span>Скрытое</span><label class="switch"><input type="checkbox" id="comm-hidden"><span class="slider"></span></label></div>
+      <div class="row"><span>Платный вход</span><label class="switch"><input type="checkbox" onchange="document.getElementById('comm-price-box').style.display = this.checked ? 'flex' : 'none'"><span class="slider"></span></label></div>
+      <div class="row" id="comm-price-box" style="display:none;">
+        <input type="number" id="comm-price" placeholder="Цена" style="width: 60%;">
+        <select id="comm-currency" style="width: 35%;">
+          <option value="TON">TON</option>
+          <option value="NFcoin">NFcoin</option>
+          <option value="ClaudeCoin">ClaudeCoin</option>
+        </select>
+      </div>
+      <button onclick="createCommunity()">Создать</button>
+    </div>
+
+    <h2>Список сообществ</h2>
+    <div id="comm-list"></div>
+  </div>
+
+  <div id="view-settings" class="view">
+    <h1>Настройки</h1>
+    <div class="card">
+      <div class="row">
+        <span>Режим инкогнито</span>
+        <label class="switch"><input type="checkbox" id="set-incognito" onchange="toggleIncognito(this.checked)"><span class="slider"></span></label>
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: -10px; margin-bottom: 15px;">Ник меняется на Secret, аватарка на шляпу, профиль скрывается.</div>
+
+      <div class="row">
+        <span>Режим приватности</span>
+        <label class="switch"><input type="checkbox" id="set-privacy" onchange="db.user.privacy = this.checked; saveData()"><span class="slider"></span></label>
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted); margin-top: -10px; margin-bottom: 15px;">NFT/Gifts скрыты, нужны одобрения подписок.</div>
+
+      <div class="row">
+        <span>Тёмная тема</span>
+        <label class="switch"><input type="checkbox" id="set-theme" onchange="toggleTheme(this.checked)"><span class="slider"></span></label>
+      </div>
+
+      <h2 style="font-size: 16px;">Язык</h2>
+      <select id="set-lang" onchange="db.user.lang = this.value; saveData()">
+        <option value="ru">Русский (Основной)</option>
+        <option value="en">English</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+        <option value="ka">ქართული</option>
+        <option value="hy">Հայերեն</option>
+      </select>
+    </div>
+
+    <button class="outline" onclick="openSupport()">Служба поддержки</button>
+    <button class="danger" onclick="rebootApp()">Перезагрузка (Исправить баги)</button>
+  </div>
+
+  <div class="nav">
+    <div class="nav-item active" onclick="switchView('profile', this)"><div>👤</div>Профиль</div>
+    <div class="nav-item" onclick="switchView('market', this)"><div>🛒</div>Маркет</div>
+    <div class="nav-item" onclick="switchView('create', this)"><div>➕</div>Создать</div>
+    <div class="nav-item" onclick="switchView('communities', this)"><div>👥</div>Сообщества</div>
+    <div class="nav-item" onclick="switchView('settings', this)"><div>⚙️</div>Настройки</div>
+  </div>
+
+  <script>
+    // --- БАЗА ДАННЫХ (LOCALSTORAGE) ---
+    const defaultDB = {
+      user: {
+        nick: "CryptoLord", avatar: "😎",
+        balances: { TON: 5000, NFcoin: 50000, ClaudeCoin: 200000 }, // Стартовый капитал
+        incognito: false, privacy: false, theme: 'dark', lang: 'ru',
+        myNFTs: [], following: 12, followers: 340
+      },
+      market: [
+        { id: 1, title: "Genesis Block", desc: "Первый NFT в системе", price: 500, currency: "TON", img: "💎", isElite: true, isLimited: false, author: "System" },
+        { id: 2, title: "Free Mint Ape", desc: "Бесплатная раздача!", price: 0, currency: "TON", img: "🦍", isElite: false, isLimited: true, author: "User99" }
+      ],
+      communities: [
+        { name: "Трейдеры СНГ", members: 1540, private: false, price: 0 }
+      ]
+    };
+
+    let db = JSON.parse(localStorage.getItem('nftzet_db')) || defaultDB;
+    let tempMediaUrl = "";
+
+    // --- ИНИЦИАЛИЗАЦИЯ ---
+    function initApp() {
+      // Применяем настройки
+      toggleTheme(db.user.theme === 'dark');
+      document.getElementById('set-theme').checked = db.user.theme === 'dark';
+      document.getElementById('set-incognito').checked = db.user.incognito;
+      document.getElementById('set-privacy').checked = db.user.privacy;
+      document.getElementById('set-lang').value = db.user.lang;
+
+      toggleIncognito(db.user.incognito, true); // Обновляем UI профиля
+      renderWallet();
+      renderMarket();
+      renderCommunities();
+    }
+
+    function saveData() {
+      localStorage.setItem('nftzet_db', JSON.stringify(db));
+      renderWallet();
+    }
+
+    function rebootApp() {
+      // Имитация перезагрузки с сохранением
+      saveData();
+      document.body.style.opacity = '0';
+      setTimeout(() => location.reload(), 500);
+    }
+
+    // --- НАВИГАЦИЯ ---
+    function switchView(viewId, el) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('view-' + viewId).classList.add('active');
+      el.classList.add('active');
+      window.scrollTo(0, 0);
+      
+      if(viewId === 'profile') renderMyNFTs();
+      if(viewId === 'market') renderMarket();
+    }
+
+    // --- НАСТРОЙКИ И ПРОФИЛЬ ---
+    function toggleTheme(isDark) {
+      db.user.theme = isDark ? 'dark' : 'light';
+      document.body.setAttribute('data-theme', db.user.theme);
+      saveData();
+    }
+
+    function toggleIncognito(isIncognito, noSave = false) {
+      db.user.incognito = isIncognito;
+      if(!noSave) saveData();
+
+      const nickEl = document.getElementById('prof-nick');
+      const avaEl = document.getElementById('prof-avatar');
+      const lockEl = document.getElementById('private-lock');
+      const listEl = document.getElementById('my-nft-list');
+
+      if (isIncognito) {
+        nickEl.innerText = "Secret";
+        avaEl.innerText = "🎩";
+        avaEl.classList.add('avatar-secret');
+        lockEl.style.display = "block";
+        listEl.style.display = "none";
+      } else {
+        nickEl.innerText = db.user.nick;
+        avaEl.innerText = db.user.avatar;
+        avaEl.classList.remove('avatar-secret');
+        lockEl.style.display = "none";
+        listEl.style.display = "grid";
+        renderMyNFTs();
+      }
+    }
+
+    function changeNick() {
+      if(db.user.incognito) return alert("Отключите инкогнито для смены ника!");
+      const newNick = prompt("Введите новый ник:", db.user.nick);
+      if(newNick) {
+        db.user.nick = newNick;
+        document.getElementById('prof-nick').innerText = newNick;
+        saveData();
+      }
+    }
+
+    function openSupport() {
+      const msg = prompt("Служба поддержки. Опишите проблему:");
+      if(msg) alert("Сообщение отправлено. Тикет сохранен во внутренней базе.");
+    }
+
+    function renderWallet() {
+      const w = document.getElementById('wallet-display');
+      w.innerHTML = `
+        <div class="wallet-pill">💎 ${db.user.balances.TON} TON</div>
+        <div class="wallet-pill">🪙 ${db.user.balances.NFcoin} NFcoin</div>
+        <div class="wallet-pill">🤖 ${db.user.balances.ClaudeCoin} C-Coin</div>
+      `;
+    }
+
+    // --- СОЗДАНИЕ NFT ---
+    function generateAINFT() {
+      const prompt = document.getElementById('ai-prompt').value;
+      if(!prompt) return alert("Введите описание для ИИ!");
+      
+      const btn = document.querySelector('.elite-btn');
+      btn.innerText = "Генерация...";
+      
+      // Симуляция работы нейросети
+      setTimeout(() => {
+        tempMediaUrl = "✨"; // Смайл как заглушка сгенерированной картинки
+        const box = document.getElementById('preview-box');
+        box.style.display = "flex";
+        box.className = "nft-img watermark shiny"; // Добавляем блеск
+        box.innerHTML = `<span style="font-size: 60px; z-index: 1;">${tempMediaUrl}</span>`;
+        document.getElementById('nft-settings').style.display = "block";
+        btn.innerText = "✨ Сгенерировать AI";
+      }, 1500);
+    }
+
+    function handleFileUpload(input) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (file.type.includes('video')) {
+          alert(`Сервер NFTzet: Видео ${file.name} загружено. Оно будет обрезано до 5 секунд.`);
+          tempMediaUrl = "🎬";
+        } else {
+          tempMediaUrl = "🖼️";
+        }
         
-        <div onclick="showWallet()" class="flex items-center bg-zinc-800 hover:bg-zinc-700 rounded-3xl px-4 py-1 text-sm font-medium cursor-pointer">
-            <span id="balance-ton">500 TON</span>
-            <span class="mx-2 text-emerald-400">•</span>
-            <span id="balance-nf">10k NF</span>
-            <span class="mx-2 text-emerald-400">•</span>
-            <span id="balance-claude">500k CC</span>
-        </div>
+        const box = document.getElementById('preview-box');
+        box.style.display = "flex";
+        box.className = "nft-img watermark"; // Водяной знак при загрузке
+        box.innerHTML = `<span style="font-size: 60px; z-index: 1;">${tempMediaUrl}</span>`;
+        document.getElementById('nft-settings').style.display = "block";
+      }
+    }
 
-        <div onclick="switchTab(0)" class="cursor-pointer relative">
-            <div id="header-avatar" class="w-9 h-9 rounded-2xl bg-zinc-700 overflow-hidden ring-2 ring-emerald-400"></div>
-            <div id="incognito-header-badge" class="hidden absolute -top-1 -right-1 bg-black text-[10px] font-bold px-2 py-px rounded-xl">SECRET</div>
-        </div>
-    </div>
+    function publishNFT(isFree) {
+      const title = document.getElementById('nft-title').value;
+      const desc = document.getElementById('nft-desc').value;
+      let price = Number(document.getElementById('nft-price').value);
+      const currency = document.getElementById('nft-currency').value;
+      const isLimited = document.getElementById('nft-limited').checked;
+      const isElite = document.getElementById('nft-elite').checked;
 
-    <!-- MAIN CONTENT -->
-    <div class="max-w-xl mx-auto px-4 pt-2">
+      if(!title) return alert("Укажите название!");
+      if(isFree) price = 0;
 
-        <!-- TAB 3: МАРКЕТ (стартовый экран) -->
-        <div id="tab-3" class="tab-content">
-            <h2 class="text-3xl font-semibold mb-6">Маркет NFT</h2>
-            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
-                <div onclick="filterMarket(this)" data-filter="all" class="market-filter active px-6 py-2 bg-emerald-400 text-black rounded-3xl text-sm">Все</div>
-                <div onclick="filterMarket(this)" data-filter="free" class="market-filter px-6 py-2 bg-zinc-800 rounded-3xl text-sm">Бесплатно</div>
-                <div onclick="filterMarket(this)" data-filter="ton" class="market-filter px-6 py-2 bg-zinc-800 rounded-3xl text-sm">TON</div>
-                <div onclick="filterMarket(this)" data-filter="nfcoin" class="market-filter px-6 py-2 bg-zinc-800 rounded-3xl text-sm">NFcoin</div>
-                <div onclick="filterMarket(this)" data-filter="claude" class="market-filter px-6 py-2 bg-zinc-800 rounded-3xl text-sm">ClaudeCoin</div>
+      // Проверка оплаты Элитного статуса
+      if(isElite) {
+        let cost = currency === 'TON' ? 1000 : currency === 'NFcoin' ? 10000 : 100000;
+        if(db.user.balances[currency] < cost) {
+          return alert(`Недостаточно средств для Элитного статуса! Нужно ${cost} ${currency}`);
+        }
+        db.user.balances[currency] -= cost;
+      }
+
+      const newNFT = {
+        id: Date.now(), title, desc, price, currency, img: tempMediaUrl, 
+        isElite, isLimited, author: db.user.incognito ? "Secret" : db.user.nick,
+        isShiny: tempMediaUrl === "✨"
+      };
+
+      db.market.unshift(newNFT); // Добавляем в общий маркет
+      saveData();
+      
+      alert(isFree ? "Опубликовано БЕСПЛАТНО!" : "Успешно опубликовано в маркет!");
+      
+      // Сброс формы
+      document.getElementById('nft-settings').style.display = "none";
+      document.getElementById('preview-box').style.display = "none";
+      document.getElementById('ai-prompt').value = "";
+      switchView('market', document.querySelectorAll('.nav-item')[1]);
+    }
+
+    // --- РЕНДЕР МАРКЕТА И ПРОФИЛЯ ---
+    function createNFTHTML(nft, isMine = false) {
+      let badges = "";
+      if(nft.isElite) badges += `<div class="badge elite">ELITE</div>`;
+      if(nft.isLimited) badges += `<div class="badge limited">LIMITED</div>`;
+      
+      let priceTag = nft.price === 0 ? "Бесплатно" : `${nft.price} ${nft.currency}`;
+      let actionBtn = isMine ? 
+        `<button class="outline" style="padding:6px; font-size:12px; margin:0;" onclick="alert('Скрыто из маркета')">Скрыть</button>` :
+        `<button style="padding:6px; font-size:12px; margin:0;" onclick="buyNFT(${nft.id})">${nft.price === 0 ? 'Забрать' : 'Купить'}</button>`;
+
+      return `
+        <div class="nft-card">
+          ${badges}
+          <div class="nft-img ${nft.isShiny ? 'shiny' : ''} ${!isMine ? 'watermark' : ''}">
+            <span style="z-index: 1;">${nft.img}</span>
+          </div>
+          <div class="nft-info">
+            <div>
+              <div class="nft-title">${nft.title}</div>
+              <div class="nft-desc">${nft.desc || "Нет описания"}</div>
+              <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 5px;">Автор: ${nft.author}</div>
             </div>
-            <div id="market-grid" class="grid grid-cols-2 gap-4"></div>
-        </div>
-
-        <!-- TAB 0: ПРОФИЛЬ -->
-        <div id="tab-0" class="tab-content hidden">
-            <div class="flex flex-col items-center pt-6">
-                <div onclick="editAvatar()" class="relative cursor-pointer">
-                    <div id="profile-avatar" class="w-32 h-32 rounded-3xl bg-zinc-700 overflow-hidden ring-4 ring-emerald-400 shadow-2xl"></div>
-                    <div id="incognito-badge" class="hidden absolute -top-2 -right-2 bg-black text-white text-xs font-bold px-3 py-1 rounded-2xl">🕵️ SECRET</div>
-                </div>
-
-                <div class="flex items-center gap-x-3 mt-4">
-                    <h2 id="profile-nick" onclick="editNick()" class="text-4xl font-semibold cursor-pointer">Aleks</h2>
-                    <button onclick="attachNFTToNick()" class="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-violet-400 to-emerald-400 rounded-2xl text-white shadow-lg hover:scale-110">✨</button>
-                </div>
-
-                <p id="profile-description" onclick="editDescription()" class="text-zinc-400 text-center mt-1 max-w-[280px] line-clamp-2">Твой профиль • NFT-коллекционер и создатель</p>
-
-                <div class="flex gap-x-8 mt-8 text-center">
-                    <div onclick="showSubscribers()">
-                        <div id="subscribers-count" class="text-3xl font-bold">248</div>
-                        <div class="text-xs text-zinc-400 tracking-widest">ПОДПИСЧИКИ</div>
-                    </div>
-                    <div onclick="showSubscribed()">
-                        <div id="subscribed-count" class="text-3xl font-bold">87</div>
-                        <div class="text-xs text-zinc-400 tracking-widest">ПОДПИСКИ</div>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-3 gap-3 w-full mt-8">
-                    <button onclick="showMyNFTs()" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 py-4 rounded-3xl">🖼️<br>МОИ NFT</button>
-                    <button onclick="showSubscribers()" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 py-4 rounded-3xl">👥<br>ПОДПИСЧИКИ</button>
-                    <button onclick="openSupport()" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 py-4 rounded-3xl">🛠️<br>ПОДДЕРЖКА</button>
-                </div>
-
-                <div class="w-full mt-10">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-semibold">Коллекция NFT</h3>
-                        <button onclick="showMyNFTs()" class="text-emerald-400 text-sm">ВСЁ →</button>
-                    </div>
-                    <div id="profile-nfts-grid" class="grid grid-cols-3 gap-3"></div>
-                </div>
+            <div class="row" style="margin:0;">
+              <span class="nft-price">${priceTag}</span>
+              ${actionBtn}
             </div>
+          </div>
         </div>
+      `;
+    }
 
-        <!-- TAB 1: СООБЩЕСТВА -->
-        <div id="tab-1" class="tab-content hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-semibold">Сообщества</h2>
-                <button onclick="createCommunityModal()" class="bg-emerald-400 text-black px-6 h-12 rounded-3xl">+ Создать</button>
+    function renderMarket() {
+      const list = document.getElementById('market-list');
+      list.innerHTML = db.market.map(nft => createNFTHTML(nft)).join('');
+    }
+
+    function renderMyNFTs() {
+      const list = document.getElementById('my-nft-list');
+      document.getElementById('prof-nft-count').innerText = db.user.myNFTs.length;
+      if(db.user.myNFTs.length === 0) {
+        list.innerHTML = `<div style="grid-column: span 2; text-align:center; color: var(--text-muted); padding: 20px;">Нет NFT</div>`;
+        return;
+      }
+      list.innerHTML = db.user.myNFTs.map(nft => createNFTHTML(nft, true)).join('');
+    }
+
+    // --- ПОКУПКА NFT ---
+    function buyNFT(id) {
+      const index = db.market.findIndex(n => n.id === id);
+      if(index === -1) return;
+      const nft = db.market[index];
+
+      if(nft.price > 0) {
+        if(db.user.balances[nft.currency] < nft.price) {
+          return alert(`Недостаточно средств! Нужно ${nft.price} ${nft.currency}`);
+        }
+        db.user.balances[nft.currency] -= nft.price; // Списание
+      }
+
+      // Перенос из маркета в профиль
+      db.user.myNFTs.push(nft);
+      db.market.splice(index, 1);
+      saveData();
+      
+      alert(`Вы успешно ${nft.price === 0 ? 'забрали' : 'купили'} NFT: ${nft.title}`);
+      renderMarket();
+    }
+
+    // --- СООБЩЕСТВА ---
+    function createCommunity() {
+      const name = document.getElementById('comm-name').value;
+      if(!name) return alert("Введите название!");
+      const isPrivate = document.getElementById('comm-private').checked;
+      const price = Number(document.getElementById('comm-price').value) || 0;
+      
+      db.communities.unshift({ name, members: 1, private: isPrivate, price });
+      saveData();
+      alert("Сообщество создано!");
+      document.getElementById('comm-form').style.display = 'none';
+      renderCommunities();
+    }
+
+    function renderCommunities() {
+      const list = document.getElementById('comm-list');
+      list.innerHTML = db.communities.map(c => `
+        <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:bold;">${c.name}</div>
+            <div style="font-size:12px; color:var(--text-muted);">
+              👥 ${c.members} | ${c.private ? '🔒 Приватное' : '🌐 Открытое'}
             </div>
-            <div id="my-communities-list" class="space-y-3"></div>
+          </div>
+          <button style="width:auto; padding: 8px 16px; margin:0;">${c.price > 0 ? c.price + ' Вход' : 'Войти'}</button>
         </div>
+      `).join('');
+    }
 
-        <!-- TAB 2: СОЗДАТЬ NFT -->
-        <div id="tab-2" class="tab-content hidden">
-            <h2 class="text-3xl font-semibold mb-6">Создать NFT</h2>
-            
-            <div id="preview-container" class="relative bg-zinc-900 rounded-3xl overflow-hidden aspect-video mb-6 shadow-2xl border border-zinc-700">
-                <div id="preview-image" class="hidden w-full h-full"></div>
-                <video id="preview-video" class="hidden w-full h-full object-cover" autoplay loop muted></video>
-                <div id="preview-placeholder" class="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-black">
-                    <div class="text-center">
-                        <div class="text-7xl mb-4">🪐</div>
-                        <p>Загрузи фото / видео<br>или сгенерируй по тексту</p>
-                    </div>
-                </div>
-                <div id="watermark-preview" class="watermark absolute bottom-6 right-8 hidden">NFTzet</div>
-            </div>
-
-            <div class="mb-6">
-                <div class="flex gap-3 mb-3">
-                    <select id="generation-style" class="flex-1 bg-zinc-900 border border-zinc-700 rounded-3xl px-5 py-4 text-sm">
-                        <option value="cyber">Киберпанк</option>
-                        <option value="space">Космос</option>
-                        <option value="neon">Неон</option>
-                    </select>
-                    <input id="prompt-input" type="text" placeholder="Опиши свой NFT..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-3xl px-6 py-4 text-sm">
-                </div>
-                <button onclick="generateByText()" class="w-full bg-gradient-to-r from-emerald-400 to-cyan-400 text-black font-semibold py-5 rounded-3xl">✨ Сгенерировать</button>
-            </div>
-
-            <label class="block border-2 border-dashed border-zinc-700 hover:border-emerald-400 rounded-3xl py-8 text-center cursor-pointer mb-8">
-                <input type="file" id="file-upload" accept="image/jpeg,image/png,video/mp4" class="hidden" onchange="handleFileUpload(event)">
-                <div class="text-emerald-400 text-5xl mb-3">📤</div>
-                <p class="font-semibold">Загрузить фото или видео (max 5 сек)</p>
-            </label>
-
-            <div class="bg-zinc-900 rounded-3xl p-6 space-y-6">
-                <input id="nft-name" placeholder="Название NFT" class="w-full bg-black border border-zinc-700 rounded-2xl px-5 py-4">
-                <textarea id="nft-description" placeholder="Описание" rows="3" class="w-full bg-black border border-zinc-700 rounded-2xl px-5 py-4"></textarea>
-                
-                <div class="flex gap-4">
-                    <input id="nft-price" type="text" value="0" class="flex-1 bg-black border border-zinc-700 rounded-2xl px-5 py-4">
-                    <select id="nft-currency" class="bg-black border border-zinc-700 rounded-2xl px-5 py-4">
-                        <option>TON</option>
-                        <option>NFcoin</option>
-                        <option>ClaudeCoin</option>
-                    </select>
-                </div>
-
-                <div class="flex gap-3">
-                    <button onclick="publishNFT(true)" class="flex-1 py-5 border-2 border-emerald-400 text-emerald-400 rounded-3xl">Бесплатно</button>
-                    <button onclick="publishNFT(false)" class="flex-1 py-5 bg-emerald-400 text-black rounded-3xl">Опубликовать</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB 4: НАСТРОЙКИ -->
-        <div id="tab-4" class="tab-content hidden p-4">
-            <h2 class="text-3xl font-semibold mb-8">Настройки</h2>
-            <div class="space-y-6">
-                <div class="flex items-center justify-between bg-zinc-900 rounded-3xl px-6 py-5">
-                    <div class="flex items-center gap-x-4">
-                        <span class="text-4xl">🕵️</span>
-                        <div>
-                            <p class="font-semibold">Режим инкогнито</p>
-                            <p class="text-sm text-zinc-400">Ник = Secret, аватарка — чёрная шляпа</p>
-                        </div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="incognito-toggle" onchange="toggleIncognito()" class="sr-only peer">
-                        <div class="w-12 h-7 bg-zinc-700 rounded-3xl peer peer-checked:bg-emerald-400"></div>
-                        <div class="absolute left-1 top-1 w-5 h-5 bg-white rounded-2xl transition peer-checked:translate-x-5"></div>
-                    </label>
-                </div>
-
-                <div class="flex items-center justify-between bg-zinc-900 rounded-3xl px-6 py-5">
-                    <div class="flex items-center gap-x-4">
-                        <span class="text-4xl">🔒</span>
-                        <div>
-                            <p class="font-semibold">Режим приватности</p>
-                            <p class="text-sm text-zinc-400">NFT скрыты до одобрения подписки</p>
-                        </div>
-                    </div>
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="privacy-toggle" onchange="togglePrivacy()" class="sr-only peer">
-                        <div class="w-12 h-7 bg-zinc-700 rounded-3xl peer peer-checked:bg-emerald-400"></div>
-                        <div class="absolute left-1 top-1 w-5 h-5 bg-white rounded-2xl transition peer-checked:translate-x-5"></div>
-                    </label>
-                </div>
-
-                <div class="bg-zinc-900 rounded-3xl px-6 py-5">
-                    <p class="font-semibold mb-4">Язык интерфейса</p>
-                    <select id="language-select" onchange="changeLanguage()" class="w-full bg-black border border-zinc-700 rounded-2xl px-5 py-4 text-lg">
-                        <option value="ru">🇷🇺 Русский</option>
-                        <option value="en">🇬🇧 English</option>
-                        <option value="zh">🇨🇳 中文</option>
-                        <option value="ja">🇯🇵 日本語</option>
-                        <option value="ka">🇬🇪 ქართული</option>
-                        <option value="hy">🇦🇲 Հայերեն</option>
-                    </select>
-                </div>
-
-                <div onclick="toggleTheme()" class="flex items-center justify-between bg-zinc-900 rounded-3xl px-6 py-5 cursor-pointer">
-                    <div class="flex items-center gap-x-4">
-                        <span class="text-4xl">🌗</span>
-                        <p class="font-semibold">Смена темы</p>
-                    </div>
-                    <span id="theme-icon" class="text-3xl">🌑</span>
-                </div>
-
-                <button onclick="reloadApp()" class="w-full bg-gradient-to-r from-orange-400 to-red-400 text-black font-semibold py-6 rounded-3xl">🔄 Перезагрузить приложение</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- BOTTOM NAVIGATION -->
-    <div class="fixed bottom-0 left-0 right-0 max-w-xl mx-auto bg-zinc-900 border-t border-zinc-700">
-        <div class="flex text-xs font-medium">
-            <div onclick="switchTab(0)" class="flex-1 py-3 text-center">👤 Профиль</div>
-            <div onclick="switchTab(1)" class="flex-1 py-3 text-center">👥 Сообщества</div>
-            <div onclick="switchTab(2)" class="flex-1 py-3 text-center">✨ Создать</div>
-            <div onclick="switchTab(3)" class="flex-1 py-3 text-center text-emerald-400">🛒 Маркет</div>
-            <div onclick="switchTab(4)" class="flex-1 py-3 text-center">⚙️ Настройки</div>
-        </div>
-    </div>
-
-    <script>
-        // ==================== IndexedDB ====================
-        let db;
-        async function initDB() {
-            return new Promise((resolve) => {
-                const request = indexedDB.open('NFTzetDB', 3);
-                request.onupgradeneeded = e => {
-                    db = e.target.result;
-                    if (!db.objectStoreNames.contains('user')) db.createObjectStore('user', {keyPath: 'id'});
-                    if (!db.objectStoreNames.contains('myNFTs')) db.createObjectStore('myNFTs', {keyPath: 'id'});
-                    if (!db.objectStoreNames.contains('marketNFTs')) db.createObjectStore('marketNFTs', {keyPath: 'id'});
-                    if (!db.objectStoreNames.contains('myCommunities')) db.createObjectStore('myCommunities', {keyPath: 'id'});
-                };
-                request.onsuccess = e => {
-                    db = e.target.result;
-                    resolve();
-                };
-            });
-        }
-
-        async function saveToDB(store, data) {
-            const tx = db.transaction(store, 'readwrite');
-            const st = tx.objectStore(store);
-            if (Array.isArray(data)) {
-                st.clear();
-                data.forEach(item => st.put(item));
-            } else {
-                st.put(data);
-            }
-        }
-
-        async function loadFromDB(store) {
-            const tx = db.transaction(store, 'readonly');
-            const st = tx.objectStore(store);
-            return new Promise(resolve => {
-                const req = st.getAll();
-                req.onsuccess = () => resolve(req.result || []);
-            });
-        }
-
-        // ==================== ДАННЫЕ ====================
-        let currentUser = {
-            id: 1,
-            nick: "Aleks",
-            avatar: null,
-            incognito: false,
-            privacyMode: false,
-            language: "ru",
-            theme: "dark",
-            balance: { ton: 500, nfcoin: 10000, claudeCoin: 500000 },
-            description: "Твой профиль • NFT-коллекционер и создатель",
-            attachedNFTId: null,
-            subscribers: 248,
-            subscribedTo: 87
-        };
-
-        let myNFTs = [];
-        let marketNFTs = [];
-        let myCommunities = [];
-
-        let currentPreview = { type: null, data: null };
-        let currentTab = 3; // Старт с Маркета
-
-        function seedFakeMarket() {
-            if (marketNFTs.length > 0) return;
-            marketNFTs = [
-                { id: 'm1', name: 'Neon Dragon', description: 'Кибер-дракон', image: 'https://picsum.photos/id/1015/600/600', price: {amount:15,currency:'TON'}, isElite: true },
-                { id: 'm2', name: 'Cosmic Rose', description: 'Галактический цветок', image: 'https://picsum.photos/id/201/600/600', price: null, isTemporary: true }
-            ];
-        }
-
-        // ==================== РЕНДЕРЫ ====================
-        function renderHeader() {
-            const avatarEl = document.getElementById('header-avatar');
-            if (currentUser.incognito) {
-                avatarEl.innerHTML = `<div class="w-full h-full bg-black flex items-center justify-center text-4xl">🎩</div>`;
-                document.getElementById('incognito-header-badge').classList.remove('hidden');
-            } else if (currentUser.avatar) {
-                avatarEl.innerHTML = `<img src="${currentUser.avatar}" class="w-full h-full object-cover">`;
-                document.getElementById('incognito-header-badge').classList.add('hidden');
-            } else {
-                avatarEl.innerHTML = `<div class="w-full h-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-4xl">🪐</div>`;
-                document.getElementById('incognito-header-badge').classList.add('hidden');
-            }
-        }
-
-        function renderProfile() {
-            const avatarContainer = document.getElementById('profile-avatar');
-            if (currentUser.incognito) {
-                avatarContainer.innerHTML = `<div class="w-full h-full bg-black flex items-center justify-center text-7xl">🎩</div>`;
-                document.getElementById('incognito-badge').classList.remove('hidden');
-                document.getElementById('profile-nick').textContent = 'Secret';
-            } else {
-                avatarContainer.innerHTML = currentUser.avatar 
-                    ? `<img src="${currentUser.avatar}" class="w-full h-full object-cover">` 
-                    : `<div class="w-full h-full bg-gradient-to-br from-emerald-400 to-cyan-400 flex items-center justify-center text-7xl">🪐</div>`;
-                document.getElementById('incognito-badge').classList.add('hidden');
-                document.getElementById('profile-nick').textContent = currentUser.nick;
-            }
-        }
-
-        function renderMarket() {
-            const grid = document.getElementById('market-grid');
-            grid.innerHTML = '';
-            marketNFTs.forEach(nft => {
-                const div = document.createElement('div');
-                div.className = 'nft-card bg-zinc-900 rounded-3xl overflow-hidden border border-zinc-700';
-                div.innerHTML = `
-                    <img src="${nft.image}" class="w-full aspect-square object-cover">
-                    <div class="p-4">
-                        <p class="font-semibold">${nft.name}</p>
-                        <p class="text-emerald-400">${nft.price ? nft.price.amount + ' ' + nft.price.currency : 'БЕСПЛАТНО'}</p>
-                    </div>
-                `;
-                grid.appendChild(div);
-            });
-        }
-
-        // ==================== ОСНОВНЫЕ ФУНКЦИИ ====================
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-        }
-
-        function toggleIncognito() {
-            currentUser.incognito = !currentUser.incognito;
-            renderHeader();
-            renderProfile();
-        }
-
-        function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = ev => {
-                currentPreview.data = ev.target.result;
-                currentPreview.type = file.type.startsWith('video') ? 'video' : 'image';
-                document.getElementById('preview-placeholder').classList.add('hidden');
-                document.getElementById('watermark-preview').classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function generateByText() {
-            const prompt = document.getElementById('prompt-input').value || "Космический дракон";
-            const canvas = document.createElement('canvas');
-            canvas.width = 600; canvas.height = 600;
-            const ctx = canvas.getContext('2d');
-            ctx.fillStyle = '#0a0022';
-            ctx.fillRect(0,0,600,600);
-            ctx.shadowColor = '#00ff9d';
-            ctx.shadowBlur = 60;
-            ctx.fillStyle = '#111133';
-            ctx.fillRect(80,80,440,440);
-            ctx.font = '700 48px Space Grotesk';
-            ctx.fillStyle = '#ffffff';
-            ctx.textAlign = 'center';
-            ctx.fillText(prompt.toUpperCase().slice(0,18), 300, 280);
-            ctx.save();
-            ctx.translate(410, 520);
-            ctx.rotate(-0.25);
-            ctx.fillStyle = 'rgba(0,255,157,0.9)';
-            ctx.font = '700 52px Space Grotesk';
-            ctx.fillText('NFTzet', 0, 0);
-            ctx.restore();
-            const base64 = canvas.toDataURL('image/png');
-            currentPreview.data = base64;
-            document.getElementById('preview-image').innerHTML = `<img src="${base64}" class="w-full h-full object-cover">`;
-            document.getElementById('preview-image').classList.remove('hidden');
-            document.getElementById('preview-placeholder').classList.add('hidden');
-        }
-
-        function publishNFT(isFree) {
-            if (!currentPreview.data) return alert('Сначала создай NFT!');
-            alert('NFT успешно опубликован в маркет!');
-        }
-
-        function attachNFTToNick() {
-            alert('Открыто окно выбора NFT для ника');
-        }
-
-        function createCommunityModal() {
-            alert('Открыто создание сообщества');
-        }
-
-        function showWallet() {
-            alert('Баланс открыт');
-        }
-
-        function openSupport() {
-            const msg = prompt('Сообщение в поддержку:');
-            if (msg) alert('Отправлено!');
-        }
-
-        function reloadApp() {
-            if (confirm('Перезагрузить приложение?')) location.reload();
-        }
-
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-        }
-
-        function filterMarket(el) {
-            document.querySelectorAll('.market-filter').forEach(f => f.classList.remove('active', 'bg-emerald-400', 'text-black'));
-            el.classList.add('active', 'bg-emerald-400', 'text-black');
-        }
-
-        async function initializeApp() {
-            await initDB();
-            seedFakeMarket();
-            renderMarket();
-            renderHeader();
-            switchTab(3); // Старт с Маркета
-            console.log('%c✅ NFTzet запущен (~1580 строк)', 'color:#00ff9d');
-        }
-
-        window.onload = initializeApp;
-    </script>
+    // Старт
+    window.onload = initApp;
+  </script>
 </body>
 </html>
